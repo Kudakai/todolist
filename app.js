@@ -15,6 +15,7 @@ app.get('/', (req, res, next) => {
 })
 
 app.get('/listAlltodos', (req, res, next) => {
+    console.log("This is after git push")
     res.send(JSON.stringify(todos))
 })
 
