@@ -5,7 +5,7 @@ const todoContainer = document.querySelector('.todo-list')
 function renderTodo(todo) {
     const newLi = document.createElement('li')
     newLi.id = todo.id
-    newLi.innerHTML = `<input class="check" type="checkbox" /><span>${todo.todo}</span>`
+    newLi.innerHTML = `<input class="check" type="checkbox" ${todo.state === true ? "checked" : ""} /><span>${todo.todo}</span>`
     const checkbox = newLi.querySelector('.check')
     checkbox.addEventListener('change', (e) => {
         const element = e.target.parentElement

@@ -4,7 +4,7 @@ const path = require('path')
 const app = express()
 const port = 3000
 
-const todos = [{id: 1, todo: "Todo number 1", ready: false}] // For test purposes waiting for DB
+const todos = [{id: 1, todo: "Todo number 1", state: false}] // For test purposes waiting for DB
 
 app.use(express.static(path.join(__dirname, 'frontend')))
 
@@ -19,7 +19,10 @@ app.get('/listAlltodos', (req, res, next) => {
 })
 
 app.post('/changetodostate', (req, res, next) => {
-    console.log(req.body)
+    const newElement = req.body.request
+    const indexOfTheElement = todos.findIndex((x) => {return x.id == newElement.id})
+    todos[indexOfTheElement] = newElement
+    res.send("200 OK")
 })
 
 app.post('/addTodo', (req, res,next) => {
@@ -27,7 +30,7 @@ app.post('/addTodo', (req, res,next) => {
     const todoObj = {
         id: Math.floor(Math.random()*100),
         todo: body,
-        ready: false
+        state: false
     }
     todos.push(todoObj)
     res.send(JSON.stringify(todos))
