@@ -4,7 +4,25 @@ const todoContainer = document.querySelector('.todo-list')
 
 function renderTodo(todo) {
     const newLi = document.createElement('li')
-    newLi.innerHTML = `<input type="checkbox" /><span>${todo}</span>`
+    newLi.id = todo.id
+    newLi.innerHTML = `<input class="check" type="checkbox" /><span>${todo.todo}</span>`
+    const checkbox = newLi.querySelector('.check')
+    checkbox.addEventListener('change', (e) => {
+        const element = e.target.parentElement
+        const request = { 
+            id: element.id, 
+            todo: element.querySelector('span').textContent,
+            state: element.querySelector('.check').checked
+        }
+        console.log(request)
+        fetch('/changetodostate', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ request })
+    })
+    })
     todoContainer.appendChild(newLi)
 }
 
@@ -14,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return data.json()
         })
         .then((allTodos) => {
-            for(i = 0; i < allTodos.length; i++){
+            for(let i = 0; i < allTodos.length; i++){
                 renderTodo(allTodos[i])
             }
         })
