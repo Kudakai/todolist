@@ -8,9 +8,10 @@ body {
 
 .todo-box {
   background: white;
-  width: 350px;
+  width: 650px;
   padding: 20px;
   border-radius: 10px;
+  border: 3px dotted;
 }
 
 h1 {
