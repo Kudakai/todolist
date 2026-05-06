@@ -37,10 +37,11 @@ app.post('/addTodo', (req, res,next) => {
 })
 
 app.post('/deleteTodo', (req, res, next) => {
-    console.log("Endpoint deleting todo has been touched")
     const body = req.body.request
     const indexOfTheElement = todos.findIndex((x) => {return x.id == body.id})
+    const element = todos[indexOfTheElement]
     todos.splice(indexOfTheElement, 1)
+    res.send(JSON.stringify(element))
 })
 
 app.listen(port, () => {

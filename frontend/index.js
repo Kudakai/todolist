@@ -2,6 +2,34 @@ const addButton = document.querySelector('#add_button')
 const input = document.querySelector('#inputField')
 const todoContainer = document.querySelector('.todo-list')
 
+document.addEventListener('keydown', (e) => {
+    if(e.key === "Enter"){
+         const text = input.value.trim()
+
+    if (!text) return
+
+    fetch('/addTodo', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text })
+    })
+    .then(res => res.json())
+    .then(parsedData => {
+        input.value = ''
+        todoContainer.innerHTML = ''
+
+        for (let i = 0; i < parsedData.length; i++) {
+            renderTodo(parsedData[i])
+        }
+    })
+    .catch(err => {
+        console.error(err)
+    })
+    }
+})
+
 function renderTodo(todo) {
     const newLi = document.createElement('li')
     newLi.id = todo.id
@@ -36,6 +64,17 @@ function renderTodo(todo) {
             'Content-Type': 'application/json'
             },
             body: JSON.stringify({request})
+        })
+        .then((response) => {
+            return response.text()
+        })
+        .then((response) => {
+            return JSON.parse(response)
+        })
+        .then((response) => {
+            if(response){
+                document.getElementById(response.id).remove()
+            }
         })
     })
     todoContainer.appendChild(newLi)
