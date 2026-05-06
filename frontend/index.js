@@ -7,6 +7,7 @@ function renderTodo(todo) {
     newLi.id = todo.id
     newLi.innerHTML = `<input class="check" type="checkbox" ${todo.state === true ? "checked" : ""} /><span>${todo.todo}</span><button class="delete">Delete</button>`
     const checkbox = newLi.querySelector('.check')
+    const deleteBtn = newLi.querySelector('.delete')
     checkbox.addEventListener('change', (e) => {
         const element = e.target.parentElement
         const request = { 
@@ -22,6 +23,20 @@ function renderTodo(todo) {
                 },
                 body: JSON.stringify({ request })
     })
+    })
+
+        deleteBtn.addEventListener('click', (e) => {
+        const element = e.target.parentElement
+        const request = {
+            id: element.id
+        }
+        fetch('/deleteTodo', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({request})
+        })
     })
     todoContainer.appendChild(newLi)
 }
