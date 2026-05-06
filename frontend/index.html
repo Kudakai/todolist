@@ -9,14 +9,33 @@
 <body>
 
   <div class="todo-box">
-    <h1>List</h1>
+    <h1>Task List</h1>
+    <div class="stats">
+      <div class="stats-div">
+        <p class="stats-title">Total Tasks</p>
+        <p class="stats-value">20</p>
+      </div>
+      <div class="stats-div">
+        <p class="stats-title">Completed Tasks</p>
+        <p class="stats-value">20</p>
+      </div>
+      <div class="stats-div">
+        <p class="stats-title">Uncompleted Tasks</p>
+        <p class="stats-value">20</p>
+      </div>
+    </div>
 
     <div class="input-row">
-      <input  id = 'inputField' type="text" placeholder="Add a new task" />
-      <button id='add_button'>Add</button>
+      <input id="inputField" type="text" placeholder="Add a new task" />
+      <button id="add_button">Add</button>
     </div>
 
     <ul class="todo-list">
+      <li>
+        <input class="check" type="checkbox" />
+        <span>Number 1</span>
+        <button class="delete">Delete</button>
+      </li>
     </ul>
   </div>
   <script src="index.js"></script>
