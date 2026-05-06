@@ -4,7 +4,7 @@ const path = require('path')
 const app = express()
 const port = 3000
 
-const todos = [{id: 1, todo: "Todo number 1", state: false}] // For test purposes waiting for DB
+const todos = [] // For test purposes waiting for DB
 
 app.use(express.static(path.join(__dirname, 'frontend')))
 
@@ -14,7 +14,7 @@ app.get('/', (req, res, next) => {
     res.sendFile(path.join(__dirname, 'frontend', 'index.html'))
 })
 
-app.get('/listAlltodos', (req, res, next) => {
+app.get('/listAlltodos', (req, res, ne) => {
     res.send(JSON.stringify(todos))
 })
 
@@ -34,6 +34,10 @@ app.post('/addTodo', (req, res,next) => {
     }
     todos.push(todoObj)
     res.send(JSON.stringify(todos))
+})
+
+app.post('/deleteTodo', (req, res, next) => {
+    console.log("Endpoint deleting todo has been touched")
 })
 
 app.listen(port, () => {
