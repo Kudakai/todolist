@@ -41,7 +41,10 @@ app.post('/deleteTodo', (req, res, next) => {
     const indexOfTheElement = todos.findIndex((x) => {return x.id == body.id})
     const element = todos[indexOfTheElement]
     todos.splice(indexOfTheElement, 1)
-    res.send(JSON.stringify(element))
+    res.send(JSON.stringify({
+        deletedElement: element,
+        newTodoList: todos
+    }))
 })
 
 app.listen(port, () => {

@@ -1,6 +1,15 @@
 const addButton = document.querySelector('#add_button')
 const input = document.querySelector('#inputField')
 const todoContainer = document.querySelector('.todo-list')
+const completedTasksValue = document.getElementById('completed_tasks_value')
+const uncompletedTasksValue = document.getElementById('uncompleted_tasks_value')
+const totalTasksValue = document.getElementById('total_tasks_value')
+
+function updateValues() {
+    
+}
+
+
 
 document.addEventListener('keydown', (e) => {
     if(e.key === "Enter"){
@@ -73,7 +82,7 @@ function renderTodo(todo) {
         })
         .then((response) => {
             if(response){
-                document.getElementById(response.id).remove()
+                document.getElementById(response.deletedElement.id).remove()
             }
         })
     })
