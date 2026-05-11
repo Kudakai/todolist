@@ -15,8 +15,6 @@ function updateValues(todoList) {
     }).length
 }
 
-
-
 document.addEventListener('keydown', (e) => {
     if(e.key === "Enter"){
          const text = input.value.trim()
@@ -38,6 +36,7 @@ document.addEventListener('keydown', (e) => {
         for (let i = 0; i < parsedData.length; i++) {
             renderTodo(parsedData[i])
         }
+        updateValues(parsedData)
     })
     .catch(err => {
         console.error(err)
@@ -58,13 +57,22 @@ function renderTodo(todo) {
             todo: element.querySelector('span').textContent,
             state: element.querySelector('.check').checked
         }
-        console.log(request)
+        
         fetch('/changetodostate', {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ request })
+    })
+    .then((response) => {
+        return response.text()
+    })
+    .then((response) => {
+        return JSON.parse(response)
+    })
+    .then((reponse) => {
+        updateValues(reponse)
     })
     })
 
@@ -89,6 +97,7 @@ function renderTodo(todo) {
         .then((response) => {
             if(response){
                 document.getElementById(response.deletedElement.id).remove()
+                updateValues(response.newTodoList)
             }
         })
     })
@@ -128,6 +137,7 @@ addButton.addEventListener('click', () => {
         for (let i = 0; i < parsedData.length; i++) {
             renderTodo(parsedData[i])
         }
+        updateValues(parsedData)
     })
     .catch(err => {
         console.error(err)

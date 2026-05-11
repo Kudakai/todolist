@@ -1,5 +1,6 @@
 const express = require('express')
 const path = require('path')
+const crypto = require('crypto')
 
 const app = express()
 const port = 3000
@@ -22,13 +23,13 @@ app.post('/changetodostate', (req, res, next) => {
     const newElement = req.body.request
     const indexOfTheElement = todos.findIndex((x) => {return x.id == newElement.id})
     todos[indexOfTheElement] = newElement
-    res.send("200 OK")
+    res.send(JSON.stringify(todos))
 })
 
 app.post('/addTodo', (req, res,next) => {
     const body = req.body.text
     const todoObj = {
-        id: Math.floor(Math.random()*100),
+        id: crypto.randomUUID(),
         todo: body,
         state: false
     }
