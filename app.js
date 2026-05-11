@@ -1,6 +1,12 @@
 const express = require('express')
 const path = require('path')
 const crypto = require('crypto')
+const db = require('./db')
+
+db.query('SHOW TABLES', (err, result) => {
+    console.log(result)
+})
+
 
 const app = express()
 const port = 3000
