@@ -5,8 +5,14 @@ const completedTasksValue = document.getElementById('completed_tasks_value')
 const uncompletedTasksValue = document.getElementById('uncompleted_tasks_value')
 const totalTasksValue = document.getElementById('total_tasks_value')
 
-function updateValues() {
-    
+function updateValues(todoList) {
+    totalTasksValue.textContent = todoList.length
+    completedTasksValue.textContent = todoList.filter((todo) => {
+        return todo.state == true
+    }).length
+    uncompletedTasksValue.textContent = todoList.filter((todo) => {
+        return todo.state == false
+    }).length
 }
 
 
@@ -98,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for(let i = 0; i < allTodos.length; i++){
                 renderTodo(allTodos[i])
             }
+            updateValues(allTodos)
         })
 })
 
