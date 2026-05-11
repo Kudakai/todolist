@@ -31,7 +31,9 @@ app.post('/addTodo', (req, res,next) => {
     const todoObj = {
         id: crypto.randomUUID(),
         todo: body,
-        state: false
+        state: false,
+        username: "user1",
+        date: Date.now()
     }
     todos.push(todoObj)
     res.send(JSON.stringify(todos))
