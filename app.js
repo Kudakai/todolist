@@ -6,8 +6,8 @@ const db = require('./db')
 const app = express()
 const port = 3000
 
-async function listAllTodos() {
-        const [todos] = await db.query('SELECT * from todos')
+async function listAllTodos(date) {
+        const [todos] = await db.query('SELECT * from todos WHERE date = ?', [date])
         return todos
 }
 
@@ -26,8 +26,9 @@ app.get('/', (req, res, next) => {
 })
 
 app.get('/listAlltodos', async (req, res, next) => {
+    const date = req.query.date
     try{
-        const todos = await listAllTodos()
+        const todos = await listAllTodos(date)
         res.send(JSON.stringify(todos))
     }catch(err){
         res.status(500).send(err.message)
@@ -38,7 +39,9 @@ app.post('/changetodostate', async (req, res, next) => {
     const changedObj = req.body.request
     const newState = changedObj.state
     try{
-        const reponseFromDb = await db.query('UPDATE todos SET state = ? WHERE id = ?', [newState, changedObj.id])
+        const now = new Date()
+        const currentDate = now.toISOString().split('T')[0]
+        const reponseFromDb = await db.query('UPDATE todos SET state = ? WHERE id = ? AND date = ?', [newState, changedObj.id, currentDate])
         const newTodoList = await listAllTodos()
         res.send(JSON.stringify(newTodoList))
 
@@ -57,8 +60,10 @@ app.post('/addTodo', async (req, res,next) => {
         date: new Date().toISOString().split('T')[0]
     }
     try{
+        const now = new Date()
+        const currentDate = now.toISOString().split('T')[0]
         const response = await insertTodo(todoObj)
-        const allTodos = await listAllTodos()
+        const allTodos = await listAllTodos(currentDate)
         res.send(JSON.stringify(allTodos))
 
     }catch(err){
@@ -67,10 +72,12 @@ app.post('/addTodo', async (req, res,next) => {
 })
 
 app.post('/deleteTodo', async (req, res, next) => {
+    const now = new Date()
+    const currentDate = now.toISOString().split('T')[0]
     const deletedElementId = req.body.request.id
     const [[deletedElement]] = await db.query('SELECT * FROM todos WHERE id = ?', [deletedElementId])
     const reponseFromDb = await db.query('DELETE FROM todos WHERE id = ?', [deletedElementId])
-    const newTodoList = await listAllTodos()
+    const newTodoList = await listAllTodos(currentDate)
     res.send(JSON.stringify({
         deletedElement,
         newTodoList

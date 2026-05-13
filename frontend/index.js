@@ -8,8 +8,8 @@ const emptyInputWarning = document.getElementById('input_error')
 const datePickerInput = document.getElementById('date')
 const dateApplyBtn = document.getElementById('apply_date_button')
 
-async function requestAllTodos() {
-    const response = await fetch('/listAllTodos')
+async function requestAllTodos(date) {
+    const response = await fetch(`/listAllTodos?date=${date}`)
     const todos = await response.json()
     return todos
 }
@@ -126,10 +126,11 @@ function renderAllTodos(todos) {
 
 document.addEventListener('DOMContentLoaded', async () => {
     try{
-        const allTodos = await requestAllTodos()
+        updateDate()
+        const allTodos = await requestAllTodos(datePickerInput.value)
         renderAllTodos(allTodos)
         updateStatistics(allTodos)
-        updateDate()
+        
 
     }catch(err){
         console.error(err)
