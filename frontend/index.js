@@ -5,6 +5,8 @@ const completedTasksValue = document.getElementById('completed_tasks_value')
 const uncompletedTasksValue = document.getElementById('uncompleted_tasks_value')
 const totalTasksValue = document.getElementById('total_tasks_value')
 const emptyInputWarning = document.getElementById('input_error')
+const datePickerInput = document.getElementById('date')
+const dateApplyBtn = document.getElementById('apply_date_button')
 
 async function requestAllTodos() {
     const response = await fetch('/listAllTodos')
@@ -20,6 +22,12 @@ function updateStatistics(todoList) {
     uncompletedTasksValue.textContent = todoList.filter((todo) => {
         return todo.state == false
     }).length
+}
+
+function updateDate(){
+    const now = new Date()
+    const formattedDate = now.toISOString().split('T')[0]
+    datePickerInput.value = formattedDate
 }
 
 function renderTodo(todo) {
@@ -117,9 +125,16 @@ function renderAllTodos(todos) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const allTodos = await requestAllTodos()
-    renderAllTodos(allTodos)
-    updateStatistics(allTodos)
+    try{
+        const allTodos = await requestAllTodos()
+        renderAllTodos(allTodos)
+        updateStatistics(allTodos)
+        updateDate()
+
+    }catch(err){
+        console.error(err)
+    }
+
 })
 
 addButton.addEventListener('click', () => {

@@ -9,7 +9,11 @@
 <body>
   <div class="date-card">
     <label for="date">Select a date</label>
+
+    <div class="date-row">
     <input type="date" id="date">
+    <button id="apply_date_button">Apply</button>
+    </div>
   </div>
 
   <div class="todo-box">
@@ -17,15 +21,15 @@
     <div class="stats">
       <div class="stats-div">
         <p class="stats-title">Total Tasks</p>
-        <p class="stats-value" id="total_tasks_value">20</p>
+        <p class="stats-value" id="total_tasks_value">--</p>
       </div>
       <div class="stats-div">
         <p class="stats-title">Completed Tasks</p>
-        <p class="stats-value" id="completed_tasks_value">20</p>
+        <p class="stats-value" id="completed_tasks_value">--</p>
       </div>
       <div class="stats-div">
         <p class="stats-title">Uncompleted Tasks</p>
-        <p class="stats-value" id="uncompleted_tasks_value">20</p>
+        <p class="stats-value" id="uncompleted_tasks_value">--</p>
       </div>
     </div>
 
@@ -33,7 +37,7 @@
       <input id="inputField" type="text" placeholder="Add a new task" />
       <button id="add_button">Add</button>
     </div>
-    <p id="input_error" class="input-error hidden">Please enter a task</p>
+    <p id="input_error" class="input-error hidden">New Task field cannot be empty</p>
 
     <ul class="todo-list">
     </ul>

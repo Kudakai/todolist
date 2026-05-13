@@ -224,3 +224,18 @@ button {
 .hidden {
   display: none;
 }
+
+.date-row {
+  display: flex;
+  gap: 10px;
+}
+
+#apply_date_button {
+  background: #2563eb;
+  color: white;
+  white-space: nowrap;
+}
+
+#apply_date_button:hover {
+  background: #1d4ed8;
+}
