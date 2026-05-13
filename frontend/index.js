@@ -5,6 +5,12 @@ const completedTasksValue = document.getElementById('completed_tasks_value')
 const uncompletedTasksValue = document.getElementById('uncompleted_tasks_value')
 const totalTasksValue = document.getElementById('total_tasks_value')
 
+async function requestAllTodos() {
+    const response = await fetch('/listAllTodos')
+    const todos = await response.json()
+    return todos
+}
+
 function updateValues(todoList) {
     totalTasksValue.textContent = todoList.length
     completedTasksValue.textContent = todoList.filter((todo) => {
@@ -104,17 +110,13 @@ function renderTodo(todo) {
     todoContainer.appendChild(newLi)
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    fetch('/listAllTodos')
-        .then((data) => {
-            return data.json()
-        })
-        .then((allTodos) => {
-            for(let i = 0; i < allTodos.length; i++){
-                renderTodo(allTodos[i])
-            }
-            updateValues(allTodos)
-        })
+document.addEventListener('DOMContentLoaded', async () => {
+    const allTodos = await requestAllTodos()
+    for(let i = 0; i < allTodos.length; i++){
+        renderTodo(allTodos[i])
+        
+    }
+    updateValues(allTodos)
 })
 
 addButton.addEventListener('click', () => {
