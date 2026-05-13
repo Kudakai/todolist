@@ -34,11 +34,18 @@ app.get('/listAlltodos', async (req, res, next) => {
     }
 })
 
-app.post('/changetodostate', (req, res, next) => {
-    const newElement = req.body.request
-    const indexOfTheElement = todos.findIndex((x) => {return x.id == newElement.id})
-    todos[indexOfTheElement] = newElement
-    res.send(JSON.stringify(todos))
+app.post('/changetodostate', async (req, res, next) => {
+    const changedObj = req.body.request
+    const newState = changedObj.state
+    try{
+        const reponseFromDb = await db.query('UPDATE todos SET state = ? WHERE id = ?', [newState, changedObj.id])
+        const newTodoList = await listAllTodos()
+        res.send(JSON.stringify(newTodoList))
+
+    }catch(err){
+        res.status(500).send(err.message)
+    }
+    
 })
 
 app.post('/addTodo', async (req, res,next) => {

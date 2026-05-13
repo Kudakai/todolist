@@ -25,7 +25,7 @@ function updateStatistics(todoList) {
 function renderTodo(todo) {
     const newLi = document.createElement('li')
     newLi.id = todo.id
-    newLi.innerHTML = `<input class="check" type="checkbox" ${todo.state === true ? "checked" : ""} /><span>${todo.todo}</span><button class="delete">Delete</button>`
+    newLi.innerHTML = `<input class="check" type="checkbox" ${todo.state === 1 ? "checked" : ""} /><span>${todo.todo}</span><button class="delete">Delete</button>`
     const checkbox = newLi.querySelector('.check')
     const deleteBtn = newLi.querySelector('.delete')
     checkbox.addEventListener('change', async (e) => {
@@ -129,7 +129,7 @@ addButton.addEventListener('click', () => {
         emptyInputWarning.classList.remove('hidden')
         return
     }
-    
+
     emptyInputWarning.classList.add('hidden')
 
     fetch('/addTodo', {
