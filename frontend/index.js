@@ -11,7 +11,7 @@ async function requestAllTodos() {
     return todos
 }
 
-function updateValues(todoList) {
+function updateStatistics(todoList) {
     totalTasksValue.textContent = todoList.length
     completedTasksValue.textContent = todoList.filter((todo) => {
         return todo.state == true
@@ -19,6 +19,58 @@ function updateValues(todoList) {
     uncompletedTasksValue.textContent = todoList.filter((todo) => {
         return todo.state == false
     }).length
+}
+
+function renderTodo(todo) {
+    const newLi = document.createElement('li')
+    newLi.id = todo.id
+    newLi.innerHTML = `<input class="check" type="checkbox" ${todo.state === true ? "checked" : ""} /><span>${todo.todo}</span><button class="delete">Delete</button>`
+    const checkbox = newLi.querySelector('.check')
+    const deleteBtn = newLi.querySelector('.delete')
+    checkbox.addEventListener('change', (e) => {
+        const element = e.target.parentElement
+        const request = { 
+            id: element.id, 
+            todo: element.querySelector('span').textContent,
+            state: element.querySelector('.check').checked
+        }
+        const reponseFromServer = await fetch('/changetodostate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ request })})
+        const todos = await reponseFromServer.json()
+
+        updateStatistics(todos)
+    })
+
+    deleteBtn.addEventListener('click', (e) => {
+        const element = e.target.parentElement
+        const request = {
+            id: element.id
+        }
+        fetch('/deleteTodo', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({request})
+        })
+        .then((response) => {
+            return response.text()
+        })
+        .then((response) => {
+            return JSON.parse(response)
+        })
+        .then((response) => {
+            if(response){
+                document.getElementById(response.deletedElement.id).remove()
+                updateStatistics(response.newTodoList)
+            }
+        })
+    })
+    todoContainer.appendChild(newLi)
 }
 
 document.addEventListener('keydown', (e) => {
@@ -42,7 +94,7 @@ document.addEventListener('keydown', (e) => {
         for (let i = 0; i < parsedData.length; i++) {
             renderTodo(parsedData[i])
         }
-        updateValues(parsedData)
+        updateStatistics(parsedData)
     })
     .catch(err => {
         console.error(err)
@@ -50,73 +102,18 @@ document.addEventListener('keydown', (e) => {
     }
 })
 
-function renderTodo(todo) {
-    const newLi = document.createElement('li')
-    newLi.id = todo.id
-    newLi.innerHTML = `<input class="check" type="checkbox" ${todo.state === true ? "checked" : ""} /><span>${todo.todo}</span><button class="delete">Delete</button>`
-    const checkbox = newLi.querySelector('.check')
-    const deleteBtn = newLi.querySelector('.delete')
-    checkbox.addEventListener('change', (e) => {
-        const element = e.target.parentElement
-        const request = { 
-            id: element.id, 
-            todo: element.querySelector('span').textContent,
-            state: element.querySelector('.check').checked
-        }
-        
-        fetch('/changetodostate', {
-                method: 'POST',
-                headers: {
-                'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ request })
-    })
-    .then((response) => {
-        return response.text()
-    })
-    .then((response) => {
-        return JSON.parse(response)
-    })
-    .then((reponse) => {
-        updateValues(reponse)
-    })
-    })
 
-        deleteBtn.addEventListener('click', (e) => {
-        const element = e.target.parentElement
-        const request = {
-            id: element.id
-        }
-        fetch('/deleteTodo', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({request})
-        })
-        .then((response) => {
-            return response.text()
-        })
-        .then((response) => {
-            return JSON.parse(response)
-        })
-        .then((response) => {
-            if(response){
-                document.getElementById(response.deletedElement.id).remove()
-                updateValues(response.newTodoList)
-            }
-        })
-    })
-    todoContainer.appendChild(newLi)
+
+function renderAllTodos(todos) {
+    for(let i = 0; i < todos.length; i++){
+        renderTodo(todos[i])
+    }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
     const allTodos = await requestAllTodos()
-    for(let i = 0; i < allTodos.length; i++){
-        renderTodo(allTodos[i])
-        
-    }
-    updateValues(allTodos)
+    renderAllTodos(allTodos)
+    updateStatistics(allTodos)
 })
 
 addButton.addEventListener('click', () => {
@@ -139,7 +136,7 @@ addButton.addEventListener('click', () => {
         for (let i = 0; i < parsedData.length; i++) {
             renderTodo(parsedData[i])
         }
-        updateValues(parsedData)
+        updateStatistics(parsedData)
     })
     .catch(err => {
         console.error(err)
