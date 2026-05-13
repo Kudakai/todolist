@@ -4,6 +4,7 @@ const todoContainer = document.querySelector('.todo-list')
 const completedTasksValue = document.getElementById('completed_tasks_value')
 const uncompletedTasksValue = document.getElementById('uncompleted_tasks_value')
 const totalTasksValue = document.getElementById('total_tasks_value')
+const emptyInputWarning = document.getElementById('input_error')
 
 async function requestAllTodos() {
     const response = await fetch('/listAllTodos')
@@ -27,7 +28,7 @@ function renderTodo(todo) {
     newLi.innerHTML = `<input class="check" type="checkbox" ${todo.state === true ? "checked" : ""} /><span>${todo.todo}</span><button class="delete">Delete</button>`
     const checkbox = newLi.querySelector('.check')
     const deleteBtn = newLi.querySelector('.delete')
-    checkbox.addEventListener('change', (e) => {
+    checkbox.addEventListener('change', async (e) => {
         const element = e.target.parentElement
         const request = { 
             id: element.id, 
@@ -77,7 +78,12 @@ document.addEventListener('keydown', (e) => {
     if(e.key === "Enter"){
          const text = input.value.trim()
 
-    if (!text) return
+    if (!text){
+        emptyInputWarning.classList.remove('hidden')
+        return
+    }
+
+    emptyInputWarning.classList.add('hidden')
 
     fetch('/addTodo', {
         method: 'POST',
@@ -119,7 +125,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 addButton.addEventListener('click', () => {
     const text = input.value.trim()
 
-    if (!text) return
+    if (!text){
+        emptyInputWarning.classList.remove('hidden')
+        return
+    }
+    
+    emptyInputWarning.classList.add('hidden')
 
     fetch('/addTodo', {
         method: 'POST',

@@ -11,15 +11,10 @@ async function listAllTodos() {
         return todos
 }
 
-
-function insertTodo(req, res, todo) {
-    db.query('INSERT INTO todos (todo, state, username, date) VALUES (?, ?, ?, ?)', 
-        [todo.todo, todo.state, todo.username, todo.date], (err, result) => {
-            if(err){
-                console.log(err)
-            }
-        }
-    )
+async function insertTodo(todo) {
+    const reponse = db.query('INSERT INTO todos (todo, state, username, date) VALUES (?, ?, ?, ?)', 
+        [todo.todo, todo.state, todo.username, todo.date])
+    return reponse
 }
 
 app.use(express.static(path.join(__dirname, 'frontend')))
@@ -46,34 +41,32 @@ app.post('/changetodostate', (req, res, next) => {
     res.send(JSON.stringify(todos))
 })
 
-app.post('/addTodo', (req, res,next) => {
+app.post('/addTodo', async (req, res,next) => {
     const body = req.body.text
-    console.log(body)
     const todoObj = {
-        id: crypto.randomUUID(),
         todo: body,
         state: false,
         username: "user1",
         date: new Date().toISOString().split('T')[0]
     }
-    const {todo, state, username, date} = todoObj
-    console.log(todo, state, username, date)
-    todos.push(todoObj)
-    res.send(JSON.stringify(todos))
+    try{
+        const response = await insertTodo(todoObj)
+        const allTodos = await listAllTodos()
+        res.send(JSON.stringify(allTodos))
 
-    //SQL insert logic that will replace standart object logic
-
-    insertTodo(req, res, todoObj)
+    }catch(err){
+        res.send(err.message)
+    }
 })
 
-app.post('/deleteTodo', (req, res, next) => {
-    const body = req.body.request
-    const indexOfTheElement = todos.findIndex((x) => {return x.id == body.id})
-    const element = todos[indexOfTheElement]
-    todos.splice(indexOfTheElement, 1)
+app.post('/deleteTodo', async (req, res, next) => {
+    const deletedElementId = req.body.request.id
+    const [[deletedElement]] = await db.query('SELECT * FROM todos WHERE id = ?', [deletedElementId])
+    const reponseFromDb = await db.query('DELETE FROM todos WHERE id = ?', [deletedElementId])
+    const newTodoList = await listAllTodos()
     res.send(JSON.stringify({
-        deletedElement: element,
-        newTodoList: todos
+        deletedElement,
+        newTodoList
     }))
 })
 

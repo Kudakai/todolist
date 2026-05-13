@@ -213,3 +213,14 @@ button {
     width: 100%;
   }
 }
+
+.input-error {
+  margin-top: -10px;
+  margin-bottom: 16px;
+  color: #ef4444;
+  font-size: 14px;
+}
+
+.hidden {
+  display: none;
+}
