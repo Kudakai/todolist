@@ -3,15 +3,24 @@ const path = require('path')
 const crypto = require('crypto')
 const db = require('./db')
 
-db.query('SHOW TABLES', (err, result) => {
-    console.log(result)
-})
-
-
 const app = express()
 const port = 3000
 
-const todos = [] // For test purposes waiting for DB
+async function listAllTodos() {
+        const [todos] = await db.query('SELECT * from todos')
+        return todos
+}
+
+
+function insertTodo(req, res, todo) {
+    db.query('INSERT INTO todos (todo, state, username, date) VALUES (?, ?, ?, ?)', 
+        [todo.todo, todo.state, todo.username, todo.date], (err, result) => {
+            if(err){
+                console.log(err)
+            }
+        }
+    )
+}
 
 app.use(express.static(path.join(__dirname, 'frontend')))
 
@@ -21,8 +30,13 @@ app.get('/', (req, res, next) => {
     res.sendFile(path.join(__dirname, 'frontend', 'index.html'))
 })
 
-app.get('/listAlltodos', (req, res, ne) => {
-    res.send(JSON.stringify(todos))
+app.get('/listAlltodos', async (req, res, next) => {
+    try{
+        const todos = await listAllTodos()
+        res.send(JSON.stringify(todos))
+    }catch(err){
+        res.status(500).send(err.message)
+    }
 })
 
 app.post('/changetodostate', (req, res, next) => {
@@ -34,15 +48,22 @@ app.post('/changetodostate', (req, res, next) => {
 
 app.post('/addTodo', (req, res,next) => {
     const body = req.body.text
+    console.log(body)
     const todoObj = {
         id: crypto.randomUUID(),
         todo: body,
         state: false,
         username: "user1",
-        date: Date.now()
+        date: new Date().toISOString().split('T')[0]
     }
+    const {todo, state, username, date} = todoObj
+    console.log(todo, state, username, date)
     todos.push(todoObj)
     res.send(JSON.stringify(todos))
+
+    //SQL insert logic that will replace standart object logic
+
+    insertTodo(req, res, todoObj)
 })
 
 app.post('/deleteTodo', (req, res, next) => {
