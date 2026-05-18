@@ -8,6 +8,26 @@ const emptyInputWarning = document.getElementById('input_error')
 const datePickerInput = document.getElementById('date')
 const dateApplyBtn = document.getElementById('apply_date_button')
 
+function deletedOldTodos(){
+    const allElements = Array.from(todoContainer.children)
+    console.log(allElements)
+    for(let i = 0; i < allElements.length; i++){
+        allElements[i].remove()
+    }
+
+}
+
+
+
+dateApplyBtn.addEventListener('click', async (e) => {
+    const date = datePickerInput.value
+    console.log(`Date button clicked and sent ${date}`)
+    const todos = await requestAllTodos(date)
+    deletedOldTodos()
+    renderAllTodos(todos)
+    updateStatistics(todos)
+})
+
 async function requestAllTodos(date) {
     const response = await fetch(`/listAllTodos?date=${date}`)
     const todos = await response.json()
@@ -43,13 +63,15 @@ function renderTodo(todo) {
             todo: element.querySelector('span').textContent,
             state: element.querySelector('.check').checked
         }
-        const reponseFromServer = await fetch('/changetodostate', {
+        const reponseFromServer = await fetch(`/changetodostate?date=${datePickerInput.value}`,{
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
+
             },
             body: JSON.stringify({ request })})
         const todos = await reponseFromServer.json()
+
 
         updateStatistics(todos)
     })

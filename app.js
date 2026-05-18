@@ -36,13 +36,12 @@ app.get('/listAlltodos', async (req, res, next) => {
 })
 
 app.post('/changetodostate', async (req, res, next) => {
+    const date = req.query.date
     const changedObj = req.body.request
     const newState = changedObj.state
     try{
-        const now = new Date()
-        const currentDate = now.toISOString().split('T')[0]
-        const reponseFromDb = await db.query('UPDATE todos SET state = ? WHERE id = ? AND date = ?', [newState, changedObj.id, currentDate])
-        const newTodoList = await listAllTodos()
+        const reponseFromDb = await db.query('UPDATE todos SET state = ? WHERE id = ?', [newState, changedObj.id])
+        const newTodoList = await listAllTodos(date)
         res.send(JSON.stringify(newTodoList))
 
     }catch(err){
