@@ -219,6 +219,7 @@ button {
   margin-bottom: 16px;
   color: #ef4444;
   font-size: 14px;
+  text-align: center;
 }
 
 .hidden {
@@ -238,4 +239,8 @@ button {
 
 #apply_date_button:hover {
   background: #1d4ed8;
+}
+
+#no_todos_message{
+  text-align: center;
 }

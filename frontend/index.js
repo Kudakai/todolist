@@ -7,23 +7,26 @@ const totalTasksValue = document.getElementById('total_tasks_value')
 const emptyInputWarning = document.getElementById('input_error')
 const datePickerInput = document.getElementById('date')
 const dateApplyBtn = document.getElementById('apply_date_button')
+const noTodosMessage = document.getElementById('no_todos_message')
 
 function deletedOldTodos(){
-    const allElements = Array.from(todoContainer.children)
+    const allElements = Array.from(todoContainer.querySelectorAll('li'))
     console.log(allElements)
     for(let i = 0; i < allElements.length; i++){
         allElements[i].remove()
     }
-
 }
 
-
-
 dateApplyBtn.addEventListener('click', async (e) => {
+    emptyInputWarning.classList.add('hidden')
     const date = datePickerInput.value
     console.log(`Date button clicked and sent ${date}`)
     const todos = await requestAllTodos(date)
     deletedOldTodos()
+    if(todos.length === 0){
+        noTodosMessage.classList.remove("hidden")
+        return
+    }
     renderAllTodos(todos)
     updateStatistics(todos)
 })
@@ -77,6 +80,7 @@ function renderTodo(todo) {
     })
 
     deleteBtn.addEventListener('click', (e) => {
+        emptyInputWarning.classList.add('hidden')
         const element = e.target.parentElement
         const request = {
             id: element.id
@@ -141,6 +145,10 @@ document.addEventListener('keydown', (e) => {
 
 
 function renderAllTodos(todos) {
+    if(todos.length === 0){
+        noTodosMessage.classList.remove("hidden")
+        return
+    }
     for(let i = 0; i < todos.length; i++){
         renderTodo(todos[i])
     }
@@ -150,6 +158,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     try{
         updateDate()
         const allTodos = await requestAllTodos(datePickerInput.value)
+        if(allTodos.length === 0){
+            noTodosMessage.classList.remove('hidden')
+            return
+        }
         renderAllTodos(allTodos)
         updateStatistics(allTodos)
         
@@ -162,7 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 addButton.addEventListener('click', () => {
     const text = input.value.trim()
-
+    const todoDate = datePickerInput.value
     if (!text){
         emptyInputWarning.classList.remove('hidden')
         return
@@ -170,12 +182,19 @@ addButton.addEventListener('click', () => {
 
     emptyInputWarning.classList.add('hidden')
 
+
+
+    const reqObj = {
+        text: text,
+        date: todoDate
+    }
+
     fetch('/addTodo', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ text })
+        body: JSON.stringify({ text, todoDate })
     })
     .then(res => res.json())
     .then(parsedData => {

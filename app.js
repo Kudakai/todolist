@@ -51,12 +51,13 @@ app.post('/changetodostate', async (req, res, next) => {
 })
 
 app.post('/addTodo', async (req, res,next) => {
-    const body = req.body.text
+    const body = req.body
+    console.log(body)
     const todoObj = {
-        todo: body,
+        todo: body.text,
         state: false,
-        username: "user1",
-        date: new Date().toISOString().split('T')[0]
+        username: "rustam",
+        date: body.todoDate
     }
     try{
         const now = new Date()
