@@ -27,7 +27,6 @@ async function addTodo() {
     input.value = ''
 }
 
-
 function removeEmptyInputWarning() {
     emptyInputWarning.classList.add('hidden')
 }
@@ -47,8 +46,8 @@ function deletedOldTodos(){
 addButton.addEventListener('click', addTodo)
 
 document.addEventListener('keydown', (e) => {
-    if(e.key === "ESC"){
-
+    if(e.key === "Enter"){
+        addTodo()
     }
 })
 
