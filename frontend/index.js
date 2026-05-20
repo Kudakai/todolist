@@ -9,6 +9,14 @@ const datePickerInput = document.getElementById('date')
 const dateApplyBtn = document.getElementById('apply_date_button')
 const noTodosMessage = document.getElementById('no_todos_message')
 
+function removeEmptyInputWarning() {
+    emptyInputWarning.classList.remove('hidden')
+}
+
+function renderEmptyInputWarning() {
+    emptyInputWarning.classList.add('hidden')
+}
+
 function deletedOldTodos(){
     const allElements = Array.from(todoContainer.querySelectorAll('li'))
     console.log(allElements)
@@ -17,8 +25,47 @@ function deletedOldTodos(){
     }
 }
 
-dateApplyBtn.addEventListener('click', async (e) => {
+addButton.addEventListener('click', () => {
+    const text = input.value.trim()
+    const todoDate = datePickerInput.value
+    if (!text){
+        emptyInputWarning.classList.remove('hidden')
+        return
+    }
+
     emptyInputWarning.classList.add('hidden')
+
+
+
+    const reqObj = {
+        text: text,
+        date: todoDate
+    }
+
+    fetch('/addTodo', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text, todoDate })
+    })
+    .then(res => res.json())
+    .then(parsedData => {
+        input.value = ''
+        todoContainer.innerHTML = ''
+
+        for (let i = 0; i < parsedData.length; i++) {
+            renderTodo(parsedData[i])
+        }
+        updateStatistics(parsedData)
+    })
+    .catch(err => {
+        console.error(err)
+    })
+})
+
+dateApplyBtn.addEventListener('click', async (e) => {
+    removeEmptyInputWarning()
     const date = datePickerInput.value
     console.log(`Date button clicked and sent ${date}`)
     const todos = await requestAllTodos(date)
@@ -172,41 +219,3 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 })
 
-addButton.addEventListener('click', () => {
-    const text = input.value.trim()
-    const todoDate = datePickerInput.value
-    if (!text){
-        emptyInputWarning.classList.remove('hidden')
-        return
-    }
-
-    emptyInputWarning.classList.add('hidden')
-
-
-
-    const reqObj = {
-        text: text,
-        date: todoDate
-    }
-
-    fetch('/addTodo', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ text, todoDate })
-    })
-    .then(res => res.json())
-    .then(parsedData => {
-        input.value = ''
-        todoContainer.innerHTML = ''
-
-        for (let i = 0; i < parsedData.length; i++) {
-            renderTodo(parsedData[i])
-        }
-        updateStatistics(parsedData)
-    })
-    .catch(err => {
-        console.error(err)
-    })
-})
