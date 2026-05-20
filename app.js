@@ -54,7 +54,7 @@ app.post('/addTodo', async (req, res,next) => {
     const body = req.body
     console.log(body)
     const todoObj = {
-        todo: body.text,
+        todo: body.todoText,
         state: false,
         username: "rustam",
         date: body.todoDate
@@ -65,7 +65,6 @@ app.post('/addTodo', async (req, res,next) => {
         const response = await insertTodo(todoObj)
         const allTodos = await listAllTodos(currentDate)
         res.send(JSON.stringify(allTodos))
-
     }catch(err){
         res.send(err.message)
     }
