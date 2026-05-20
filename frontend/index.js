@@ -9,6 +9,30 @@ const datePickerInput = document.getElementById('date')
 const dateApplyBtn = document.getElementById('apply_date_button')
 const noTodosMessage = document.getElementById('no_todos_message')
 
+function removeEmptyInputWarning() {
+    emptyInputWarning.classList.add('hidden')
+}
+
+function renderEmptyInputWarning() {
+    emptyInputWarning.classList.remove('hidden')
+}
+
+function renderEmptyTodoListWarning(){
+    noTodosMessage.classList.remove('hidden')
+}
+
+function removeEmptyTodoListWarning(){
+    noTodosMessage.classList.add('hidden')
+}
+
+function deletedOldTodos(){
+    const allElements = Array.from(todoContainer.querySelectorAll('li'))
+    console.log(allElements)
+    for(let i = 0; i < allElements.length; i++){
+        allElements[i].remove()
+    }
+}
+
 async function addTodo() {
     const todoText = input.value.trim()
     const todoDate = datePickerInput.value
@@ -17,6 +41,7 @@ async function addTodo() {
         return
     }
     removeEmptyInputWarning()
+    removeEmptyTodoListWarning()
     const addTodoResponse =  await fetch('/addTodo', {method: 'POST',headers: {'Content-Type': 'application/json'},body: JSON.stringify({ todoText, todoDate })})
     const allTodos = await addTodoResponse.json()
     deletedOldTodos()
@@ -27,21 +52,19 @@ async function addTodo() {
     input.value = ''
 }
 
-function removeEmptyInputWarning() {
-    emptyInputWarning.classList.add('hidden')
-}
-
-function renderEmptyInputWarning() {
-    emptyInputWarning.classList.remove('hidden')
-}
-
-function deletedOldTodos(){
-    const allElements = Array.from(todoContainer.querySelectorAll('li'))
-    console.log(allElements)
-    for(let i = 0; i < allElements.length; i++){
-        allElements[i].remove()
+document.addEventListener('DOMContentLoaded', async () => {
+    try{
+        updateDate()
+        const allTodos = await requestAllTodos(datePickerInput.value)
+        if(allTodos.length === 0){
+            renderEmptyTodoListWarning
+        }
+        renderAllTodos(allTodos)
+        updateStatistics(allTodos)
+    }catch(err){
+        console.error(err)
     }
-}
+})
 
 addButton.addEventListener('click', addTodo)
 
@@ -53,13 +76,14 @@ document.addEventListener('keydown', (e) => {
 
 dateApplyBtn.addEventListener('click', async (e) => {
     removeEmptyInputWarning()
+    removeEmptyTodoListWarning()
     const date = datePickerInput.value
-    console.log(`Date button clicked and sent ${date}`)
     const todos = await requestAllTodos(date)
     if(todos.length === 0){
-        noTodosMessage.classList.remove("hidden")
+        renderEmptyTodoListWarning()
         return
     }
+    deletedOldTodos()
     renderAllTodos(todos)
     updateStatistics(todos)
 })
@@ -153,18 +177,3 @@ function renderAllTodos(todos) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    try{
-        updateDate()
-        const allTodos = await requestAllTodos(datePickerInput.value)
-        if(allTodos.length === 0){
-            noTodosMessage.classList.remove('hidden')
-            return
-        }
-        renderAllTodos(allTodos)
-        updateStatistics(allTodos)
-    }catch(err){
-        console.error(err)
-    }
-
-})
