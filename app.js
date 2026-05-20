@@ -52,7 +52,6 @@ app.post('/changetodostate', async (req, res, next) => {
 
 app.post('/addTodo', async (req, res,next) => {
     const body = req.body
-    console.log(body)
     const todoObj = {
         todo: body.todoText,
         state: false,

@@ -25,6 +25,12 @@ function removeEmptyTodoListWarning(){
     noTodosMessage.classList.add('hidden')
 }
 
+function nullifyStatistics(){
+    completedTasksValue.textContent = "-"
+    uncompletedTasksValue.textContent = "-"
+    totalTasksValue.textContent = "-"
+}
+
 function deletedOldTodos(){
     const allElements = Array.from(todoContainer.querySelectorAll('li'))
     console.log(allElements)
@@ -38,6 +44,7 @@ async function addTodo() {
     const todoDate = datePickerInput.value
     if (!todoText){
         renderEmptyInputWarning()
+        nullifyStatistics()
         return
     }
     removeEmptyInputWarning()
@@ -75,15 +82,16 @@ document.addEventListener('keydown', (e) => {
 })
 
 dateApplyBtn.addEventListener('click', async (e) => {
+    deletedOldTodos()
     removeEmptyInputWarning()
     removeEmptyTodoListWarning()
     const date = datePickerInput.value
     const todos = await requestAllTodos(date)
     if(todos.length === 0){
         renderEmptyTodoListWarning()
+        nullifyStatistics()
         return
     }
-    deletedOldTodos()
     renderAllTodos(todos)
     updateStatistics(todos)
 })
@@ -168,7 +176,8 @@ function renderTodo(todo) {
 
 function renderAllTodos(todos) {
     if(todos.length === 0){
-        noTodosMessage.classList.remove("hidden")
+        renderEmptyTodoListWarning()
+        nullifyStatistics()
         return
     }
     deletedOldTodos()
