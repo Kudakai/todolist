@@ -7,13 +7,13 @@ const app = express()
 const port = 80
 
 async function listAllTodos(date) {
-        const [todos] = await db.query('SELECT * from todos WHERE date = ?', [date])
-        return todos
+    const [todos] = await db.query('SELECT * from todos WHERE date = ?', [date])
+    return todos
 }
 
 async function insertTodo(todo) {
-    const reponse = db.query('INSERT INTO todos (todo, state, username, date) VALUES (?, ?, ?, ?)', 
-        [todo.todo, todo.state, todo.username, todo.date])
+    const reponse = db.query('INSERT INTO todos (todo, state, userId, date) VALUES (?, ?, ?, ?)', 
+        [todo.todo, todo.state, todo.userId, todo.date])
     return reponse
 }
 
@@ -46,6 +46,7 @@ app.post('/changetodostate', async (req, res, next) => {
 
     }catch(err){
         res.status(500).send(err.message)
+        console.log(err.message)
     }
     
 })
@@ -55,7 +56,7 @@ app.post('/addTodo', async (req, res,next) => {
     const todoObj = {
         todo: body.todoText,
         state: false,
-        username: "rustam",
+        userId: "123",
         date: body.todoDate
     }
     try{
@@ -64,6 +65,7 @@ app.post('/addTodo', async (req, res,next) => {
         res.send(JSON.stringify(allTodos))
     }catch(err){
         res.send(err.message)
+        console.log(err.message)
     }
 })
 
