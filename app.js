@@ -4,7 +4,7 @@ const crypto = require('crypto')
 const db = require('./db')
 
 const app = express()
-const port = 3000
+const port = 80
 
 async function listAllTodos(date) {
         const [todos] = await db.query('SELECT * from todos WHERE date = ?', [date])
@@ -80,7 +80,7 @@ app.post('/deleteTodo', async (req, res, next) => {
     }))
 })
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`Server up and running on port ${port}`)
 })
 
