@@ -8,19 +8,41 @@ const emptyInputWarning = document.getElementById('input_error')
 const datePickerInput = document.getElementById('date')
 const dateApplyBtn = document.getElementById('apply_date_button')
 const noTodosMessage = document.getElementById('no_todos_message')
+const chartCanvas = document.getElementById('myChart')
+const chartContainer = document.querySelector('.chart-container')
 
-const ctx = document.getElementById('myChart');
+let todoChart = null
 
-new Chart(ctx, {
-  type: 'pie',
-  data: {
-    labels: ['Completed', 'Uncompleted'],
-    datasets: [{
-      label: 'Test',
-      data: [1, 2]
-    }]
-  }
-});
+function hideChart(){
+    chartContainer.classList.add('hidden')
+}
+
+function renderAndUpdateChart(todolist) {
+    chartContainer.classList.remove('hidden')
+
+    const completed = todolist.filter(todo => todo.state == true).length
+    const uncompleted = todolist.filter(todo => todo.state == false).length
+
+    if (todoChart === null) {
+        todoChart = new Chart(chartCanvas, {
+            type: 'pie',
+            data: {
+                labels: ['Completed', 'Uncompleted'],
+                datasets: [{
+                    label: 'Statistics',
+                    data: [completed, uncompleted]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        })
+    } else {
+        todoChart.data.datasets[0].data = [completed, uncompleted]
+        todoChart.update()
+    }
+}
 
 function removeEmptyInputWarning() {
     emptyInputWarning.classList.add('hidden')
@@ -57,7 +79,6 @@ async function addTodo() {
     const todoDate = datePickerInput.value
     if (!todoText){
         renderEmptyInputWarning()
-        nullifyStatistics()
         return
     }
     removeEmptyInputWarning()
@@ -69,6 +90,7 @@ async function addTodo() {
         renderTodo(allTodos[i])
     }
     updateStatistics(allTodos)
+    renderAndUpdateChart(allTodos)
     input.value = ''
 }
 
@@ -81,6 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         renderAllTodos(allTodos)
         updateStatistics(allTodos)
+        renderAndUpdateChart(allTodos)
     }catch(err){
         console.error(err)
     }
@@ -107,6 +130,7 @@ dateApplyBtn.addEventListener('click', async (e) => {
     }
     renderAllTodos(todos)
     updateStatistics(todos)
+    renderAndUpdateChart(todos)
 })
 
 async function requestAllTodos(date) {
@@ -155,6 +179,7 @@ function renderTodo(todo) {
 
 
         updateStatistics(todos)
+        renderAndUpdateChart(todos)
     })
 
     deleteBtn.addEventListener('click', (e) => {
@@ -180,6 +205,7 @@ function renderTodo(todo) {
             if(response){
                 document.getElementById(response.deletedElement.id).remove()
                 updateStatistics(response.newTodoList)
+                renderAndUpdateChart(response.newTodoList)
             }
         })
     })
