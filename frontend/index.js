@@ -14,10 +14,10 @@ const ctx = document.getElementById('myChart');
 new Chart(ctx, {
   type: 'pie',
   data: {
-    labels: ['A', 'B', 'C'],
+    labels: ['Completed', 'Uncompleted'],
     datasets: [{
       label: 'Test',
-      data: [1, 2, 3]
+      data: [1, 2]
     }]
   }
 });
