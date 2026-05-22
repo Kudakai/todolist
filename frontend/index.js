@@ -9,6 +9,19 @@ const datePickerInput = document.getElementById('date')
 const dateApplyBtn = document.getElementById('apply_date_button')
 const noTodosMessage = document.getElementById('no_todos_message')
 
+const ctx = document.getElementById('myChart');
+
+new Chart(ctx, {
+  type: 'pie',
+  data: {
+    labels: ['A', 'B', 'C'],
+    datasets: [{
+      label: 'Test',
+      data: [1, 2, 3]
+    }]
+  }
+});
+
 function removeEmptyInputWarning() {
     emptyInputWarning.classList.add('hidden')
 }

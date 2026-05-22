@@ -244,3 +244,17 @@ button {
 #no_todos_message{
   text-align: center;
 }
+
+.chart-container {
+    width: 400px;
+    height: 400px;
+}
+
+#myChart {
+    position: fixed;
+    right: 32px;
+    top: 50%;
+    width: 180px !important;
+    height: 180px !important;
+    transform: translateY(-50%);
+}
