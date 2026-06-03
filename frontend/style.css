@@ -276,13 +276,10 @@ button {
 }
 
 .chart-container {
-  position: fixed;
-  right: 32px;
-  top: 50%;
-  width: 300px;
-  height: 300px;
-  padding: 18px;
-  transform: translateY(-50%);
+  width: min(650px, 100%);
+  height: 320px;
+  padding: 28px;
+  margin-bottom: 18px;
   background: #ffffff;
   border: 1px solid #d9e2ec;
   border-radius: 14px;
@@ -294,21 +291,10 @@ button {
   height: 100% !important;
 }
 
-@media (max-width: 1260px) {
-  .chart-container {
-    position: static;
-    width: min(300px, 100%);
-    height: 300px;
-    margin-top: 18px;
-    transform: none;
-  }
-}
-
 @media (max-width: 560px) {
   .chart-container {
-    width: min(100%, 280px);
     height: 280px;
-    padding: 14px;
+    padding: 18px;
     border-radius: 12px;
     box-shadow: 0 12px 30px rgba(31, 41, 55, 0.1);
   }
