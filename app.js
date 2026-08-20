@@ -85,7 +85,3 @@ app.post('/deleteTodo', async (req, res, next) => {
 app.listen(port, '0.0.0.0', () => {
     console.log(`Server up and running on port ${port}`)
 })
-
-
-
-UPDATE todos SET deleted = TRUE WHERE id = 3;
