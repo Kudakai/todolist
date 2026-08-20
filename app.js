@@ -7,7 +7,7 @@ const app = express()
 const port = 80
 
 async function listAllTodos(date) {
-    const [todos] = await db.query('SELECT * from todos WHERE date = ?', [date])
+    const [todos] = await db.query('SELECT * from todos WHERE date = ? and deleted = false', [date])
     return todos
 }
 
@@ -74,7 +74,7 @@ app.post('/deleteTodo', async (req, res, next) => {
     const currentDate = now.toISOString().split('T')[0]
     const deletedElementId = req.body.request.id
     const [[deletedElement]] = await db.query('SELECT * FROM todos WHERE id = ?', [deletedElementId])
-    const reponseFromDb = await db.query('DELETE FROM todos WHERE id = ?', [deletedElementId])
+    const reponseFromDb = await db.query('UPDATE todos SET deleted = TRUE WHERE id = ?;', [deletedElementId])
     const newTodoList = await listAllTodos(currentDate)
     res.send(JSON.stringify({
         deletedElement,
@@ -86,3 +86,6 @@ app.listen(port, '0.0.0.0', () => {
     console.log(`Server up and running on port ${port}`)
 })
 
+
+
+UPDATE todos SET deleted = TRUE WHERE id = 3;
