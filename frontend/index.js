@@ -99,7 +99,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateDate()
         const allTodos = await requestAllTodos(datePickerInput.value)
         if(allTodos.length === 0){
-            renderEmptyTodoListWarning
+            renderEmptyTodoListWarning()
+            hideChart()
+            return
         }
         renderAllTodos(allTodos)
         updateStatistics(allTodos)
@@ -126,6 +128,7 @@ dateApplyBtn.addEventListener('click', async (e) => {
     if(todos.length === 0){
         renderEmptyTodoListWarning()
         nullifyStatistics()
+        hideChart()
         return
     }
     renderAllTodos(todos)
@@ -202,11 +205,15 @@ function renderTodo(todo) {
             return JSON.parse(response)
         })
         .then((response) => {
-            if(response){
+            if(response.newTodoList.length === 0){
+                hideChart()
+                renderEmptyTodoListWarning()
                 document.getElementById(response.deletedElement.id).remove()
-                updateStatistics(response.newTodoList)
-                renderAndUpdateChart(response.newTodoList)
+                return
             }
+            document.getElementById(response.deletedElement.id).remove()
+            updateStatistics(response.newTodoList)
+            renderAndUpdateChart(response.newTodoList)
         })
     })
     todoContainer.appendChild(newLi)
