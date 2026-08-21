@@ -231,4 +231,3 @@ function renderAllTodos(todos) {
         renderTodo(todos[i])
     }
 }
-
