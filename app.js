@@ -4,7 +4,7 @@ const crypto = require('crypto')
 const db = require('./db')
 
 const app = express()
-const port = 80
+const port = 3000
 
 async function listAllTodos(date) {
     const [todos] = await db.query('SELECT * from todos WHERE date = ? and deleted = false', [date])
