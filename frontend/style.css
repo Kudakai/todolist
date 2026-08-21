@@ -36,6 +36,8 @@ body {
 }
 
 .date-card input[type="date"] {
+  min-width: 0;
+  max-width: 100%;
   padding: 12px 14px;
   border-radius: 8px;
   border: 1px solid #cbd5e1;
@@ -258,6 +260,8 @@ button {
 
 .date-row {
   display: flex;
+  width: 100%;
+  min-width: 0;
   gap: 10px;
 }
 
