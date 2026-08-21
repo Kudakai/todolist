@@ -7,23 +7,21 @@
 </head>
 <body>
 
-    <form action="/signup" method="POST">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username">
+    <form>
+        <h2>Sign up</h2>
+        <label for="username">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <div class="email error hidden"></div>
 
         <br><br>
 
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password">
+        <input type="password" id="password" name="password" required>
+        <div class="password error hidden"></div>
 
         <br><br>
 
-        <label for="password-confirmation">Confirm Password:</label>
-        <input type="password" id="password-confirmation" name="passwordConfirmation">
-
-        <br><br>
-
-        <button type="submit">Signup</button>
+        <button>Signup</button>
     </form>
     <script src="./signup.js"></script>
 </body>
