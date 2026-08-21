@@ -2,6 +2,8 @@ const express = require('express')
 const path = require('path')
 const crypto = require('crypto')
 const db = require('./db')
+const bcrypt = require('bcrypt')
+
 
 const app = express()
 const port = 3000
@@ -17,9 +19,50 @@ async function insertTodo(todo) {
     return reponse
 }
 
+async function createUser(email, password) {
+        const reponse = await db.query('INSERT INTO users (email, password) VALUES (?, ?)', 
+        [email, password])
+    return { id: reponse[0].insertId,
+             email: email}
+}
+
 app.use(express.static(path.join(__dirname, 'frontend')))
 
 app.use(express.json())
+
+app.use(express.urlencoded({ extended: true }));
+
+app.get('/login', (req, res, next) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'login.html'))
+    
+})
+
+app.post('/login', (req, res, next) => {
+    res.send("New login")
+    const {email, password} = req.body
+    console.log(email, password)
+})
+
+app.get('/signup', (req, res, next) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'signup.html'))
+})
+
+app.post('/signup', async (req, res, next) => {
+    const {email, password} = req.body
+    const salt = await bcrypt.genSalt()
+    const hashedPassword = await bcrypt.hash(password, salt)
+   try{
+    const user = await createUser(email, hashedPassword)
+    res.status(201).json({status: "User has been created", 
+                          user: {
+                            id:user.id,
+                            email: user.email
+                          }})
+   }
+   catch(err) {
+    res.status(400).send("error, user is not created")
+   }
+})
 
 app.get('/', (req, res, next) => {
     res.sendFile(path.join(__dirname, 'frontend', 'index.html'))
