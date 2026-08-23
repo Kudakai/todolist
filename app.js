@@ -3,6 +3,7 @@ const path = require('path')
 const crypto = require('crypto')
 const db = require('./db')
 const bcrypt = require('bcrypt')
+const cookieParser = require('cookie-parser')
 
 
 const app = express()
@@ -31,10 +32,17 @@ app.use(express.static(path.join(__dirname, 'frontend')))
 app.use(express.json())
 
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser())
 
 app.get('/login', (req, res, next) => {
     res.sendFile(path.join(__dirname, 'frontend', 'login.html'))
     
+})
+
+app.get('/set-cookies', (req, res, next) => {
+    res.cookie('newUser', true)
+    res.cookie('isEmpoyee', false, {maxAge: 1000*60*60*24})
+    res.send("Cookie has been written")
 })
 
 app.post('/login', (req, res, next) => {
