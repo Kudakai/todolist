@@ -72,17 +72,16 @@ app.post('/signup', async (req, res, next) => {
     const {email, password} = req.body
         try{
             if(!isValidEmail(email)){
-                const err = {message: 'Entered Email is not valid. Email should contain "@" symbol and email domain after "."', id: 1}
+                const err = {message: 'Entered Email is not valid. Email should contain "@" symbol and email domain after "."', errorId: 1}
                 throw err
             }
             if(!isValidPassword(password)){
-                const err = {message: 'Password should be at least 7 symbols', id: 2}
+                const err = {message: 'Password should be at least 7 symbols', errorId: 2}
                 throw err
             }
             const salt = await bcrypt.genSalt()
             const hashedPassword = await bcrypt.hash(password, salt)
             const response = await createUser(email, hashedPassword)
-            console.log(response[0])
             const userId = response[0].insertId
             const token = createToken(userId)
             res.cookie('jwt', token, {httpOnly: true, maxAge: tokensMaxAgeMilliSeconds})
@@ -90,9 +89,8 @@ app.post('/signup', async (req, res, next) => {
 
         } catch(err) {
             if(err.errno === 1062){
-                err = {message: 'Entered email is already in use',id: 3}
+                err = {message: 'Entered email is already in use',errorId: 3}
             }
-            console.log(err)
             res.status(400).send(err)
         }
 })
@@ -152,7 +150,7 @@ app.post('/deleteTodo', async (req, res, next) => {
     const [[deletedElement]] = await db.query(dbQueries.selectTodoById, [deletedElementId])
     const response = await db.query(dbQueries.deleteTodoById, [deletedElementId])
     const newTodoList = await listAllTodos(currentDate)
-    res.send(JSON.stringify({
+    res.status(200).send(JSON.stringify({
         deletedElement,
         newTodoList
     }))
