@@ -10,6 +10,21 @@ function hideAllErrors(){
     passwordError.classList.add('hidden')
 }
 
+function renderNoEmailError() {
+    emailError.innerHTML = '<p>No user with such email</p>'
+    emailError.classList.remove('hidden')
+}
+
+function renderEmailValidationError(){
+    emailError.innerHTML = '<p>The email is not valid</p>'
+    emailError.classList.remove('hidden')
+}
+
+function renderWrongPasswordError(){
+    passwordError.innerHTML = '<p>The password is wrong</p>'
+    passwordError.classList.remove('hidden')
+}
+
 form.addEventListener('submit', async (e) => {
     e.preventDefault()
     hideAllErrors()
@@ -24,6 +39,16 @@ form.addEventListener('submit', async (e) => {
                                             headers: {'Content-Type': 'application/json'}
         })
         const data = await response.json()
+        console.log(data)
+        if(data.errorId === 1){
+            renderEmailValidationError()
+        }else if(data.errorId === 2){
+            renderNoEmailError()
+        }else if(data.errorId === 3){
+            renderWrongPasswordError()
+        }else if(data.userId){
+            location.assign('/')
+        }
     } catch (err){
         
         }

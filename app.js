@@ -70,18 +70,18 @@ app.post('/login', async (req, res, next) => {
 
         const user = await db.query(dbQueries.findUserByEmail, [email])
         if(user[0].length === 0){
-            const err = {message: "No user with this email", id: 2}
+            const err = {message: "No user with this email", errorId: 2}
             throw err
         }
         const isPasswordValid = await bcrypt.compare(password, user[0][0].password)
         if(!isPasswordValid){
-            const err = {message: "Wrong password", id: 3}
+            const err = {message: "Wrong password", errorId: 3}
             throw err
         }
-        res.status(200).json({message: "Suggessfully logged in", email, id: user[0][0].id})
+        res.status(200).json({message: "Suggessfully logged in", email, userId: user[0][0].id})
     } catch(err){
         console.log(err)
-        res.status(400).json({error:err})
+        res.status(400).json({err})
 
     }
 })
