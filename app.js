@@ -4,7 +4,7 @@ const crypto = require('crypto')
 const db = require('./db')
 const bcrypt = require('bcrypt')
 const cookieParser = require('cookie-parser')
-
+const jwt = require('jsonwebtoken')
 
 const app = express()
 const port = 3000
@@ -27,6 +27,11 @@ async function createUser(email, password) {
              email: email}
 }
 
+function createToken(id){
+    const maxAge = 10 * 24 * 60 * 60;
+    return jwt.sign({id}, 'Secret key', {expiresIn: maxAge})
+}
+
 app.use(express.static(path.join(__dirname, 'frontend')))
 
 app.use(express.json())
@@ -37,12 +42,6 @@ app.use(cookieParser())
 app.get('/login', (req, res, next) => {
     res.sendFile(path.join(__dirname, 'frontend', 'login.html'))
     
-})
-
-app.get('/set-cookies', (req, res, next) => {
-    res.cookie('newUser', true)
-    res.cookie('isEmpoyee', false, {maxAge: 1000*60*60*24})
-    res.send("Cookie has been written")
 })
 
 app.post('/login', (req, res, next) => {
@@ -61,14 +60,14 @@ app.post('/signup', async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(password, salt)
    try{
     const user = await createUser(email, hashedPassword)
-    res.status(201).json({status: "User has been created", 
-                          user: {
-                            id:user.id,
-                            email: user.email
-                          }})
+    const userId = user.id
+    const token = createToken(userId)
+    res.cookie('jwt', token, {httpOnly: true, maxAge: 10 * 24 * 60 * 60 * 1000})
+    res.status(201).json({user: userId})
    }
    catch(err) {
     res.status(400).send("error, user is not created")
+    console.log(err)
    }
 })
 
