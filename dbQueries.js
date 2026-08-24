@@ -4,6 +4,7 @@ const createUser = 'INSERT INTO users (email, password) VALUES (?, ?)'
 const changeTodoStateById = 'UPDATE todos SET state = ? WHERE id = ?'
 const deleteTodoById = 'UPDATE todos SET deleted = TRUE WHERE id = ?;'
 const selectTodoById = 'SELECT * FROM todos WHERE id = ?'
+const findUserByEmail = 'SELECT * FROM users WHERE email = ?'
 
 module.exports = {
     listAllTodosByDate,
@@ -11,5 +12,6 @@ module.exports = {
     createUser,
     changeTodoStateById,
     deleteTodoById,
-    selectTodoById
+    selectTodoById,
+    findUserByEmail
 }

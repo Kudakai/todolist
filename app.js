@@ -44,8 +44,8 @@ async function createUser(email, password) {
         return response
 }
 
-function createToken(id){
-    return jwt.sign({id}, 'Secret key', {expiresIn: tokensMaxAgeSeconds})
+function createToken(id, email){
+    return jwt.sign({id, email}, 'Secret key', {expiresIn: tokensMaxAgeSeconds})
 }
 
 app.use(express.static(path.join(__dirname, 'frontend')))
@@ -60,8 +60,30 @@ app.get('/login', (req, res, next) => {
     res.sendFile(path.join(__dirname, 'frontend', 'login.html'))  
 })
 
-app.post('/login', (req, res, next) => {
+app.post('/login', async (req, res, next) => {
+    try{
+        const {email, password} = req.body
+        if(!isValidEmail(email)){
+            const err = {message: "Wrong email format", id: 1}
+            throw err
+        }
 
+        const user = await db.query(dbQueries.findUserByEmail, [email])
+        if(user[0].length === 0){
+            const err = {message: "No user with this email", id: 2}
+            throw err
+        }
+        const isPasswordValid = await bcrypt.compare(password, user[0][0].password)
+        if(!isPasswordValid){
+            const err = {message: "Wrong password", id: 3}
+            throw err
+        }
+        res.status(200).json({message: "Suggessfully logged in", email, id: user[0][0].id})
+    } catch(err){
+        console.log(err)
+        res.status(400).json({error:err})
+
+    }
 })
 
 app.get('/signup', (req, res, next) => {
@@ -83,7 +105,7 @@ app.post('/signup', async (req, res, next) => {
             const hashedPassword = await bcrypt.hash(password, salt)
             const response = await createUser(email, hashedPassword)
             const userId = response[0].insertId
-            const token = createToken(userId)
+            const token = createToken(userId, email)
             res.cookie('jwt', token, {httpOnly: true, maxAge: tokensMaxAgeMilliSeconds})
             res.status(201).json({userId: userId})
 

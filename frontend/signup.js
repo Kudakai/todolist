@@ -46,6 +46,8 @@ form.addEventListener('submit', async (e) => {
             renderPasswordValidationError()
         } else if(data.errorId === 3){
             renderEmailDuplicationError()
+        }else if(data.userId){
+            location.assign('/')
         }
     } catch (err){
         
