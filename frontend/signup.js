@@ -20,7 +20,7 @@ function renderPasswordValidationError(){
     passwordError.classList.remove('hidden')
 }
 
-function renderEmailDublicationError(){
+function renderEmailDuplicationError(){
     emailError.innerHTML = '<p>The email is already in use</p>'
     emailError.classList.remove('hidden')
 }
@@ -45,9 +45,9 @@ form.addEventListener('submit', async (e) => {
         } else if(data.errorId === 2){
             renderPasswordValidationError()
         } else if(data.errorId === 3){
-            renderEmailDublicationError()
+            renderEmailDuplicationError()
         }
-    }catch (err){
-        console.log(err)
+    } catch (err){
+        
         }
     })
