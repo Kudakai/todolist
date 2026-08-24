@@ -1,35 +1,38 @@
 const express = require('express')
 const path = require('path')
 const crypto = require('crypto')
+const dbQueries = require('./dbQueries')
 const db = require('./db')
 const bcrypt = require('bcrypt')
 const cookieParser = require('cookie-parser')
 const jwt = require('jsonwebtoken')
 
 const app = express()
+
+const tokensMaxAgeSeconds = 10 * 24 * 60 * 60
+const tokensMaxAgeMilliSeconds = 10 * 24 * 60 * 60
 const port = 3000
 
 async function listAllTodos(date) {
-    const [todos] = await db.query('SELECT * from todos WHERE date = ? and deleted = false', [date])
+    const [todos] = await db.query(dbQueries.listAllTodosByDate, [date])
     return todos
 }
 
 async function insertTodo(todo) {
-    const reponse = db.query('INSERT INTO todos (todo, state, userId, date) VALUES (?, ?, ?, ?)', 
+    const reponse = db.query(dbQueries.insertTodo, 
         [todo.todo, todo.state, todo.userId, todo.date])
     return reponse
 }
 
 async function createUser(email, password) {
-        const reponse = await db.query('INSERT INTO users (email, password) VALUES (?, ?)', 
+        const reponse = await db.query(dbQueries.createUser, 
         [email, password])
     return { id: reponse[0].insertId,
              email: email}
 }
 
 function createToken(id){
-    const maxAge = 10 * 24 * 60 * 60;
-    return jwt.sign({id}, 'Secret key', {expiresIn: maxAge})
+    return jwt.sign({id}, 'Secret key', {expiresIn: tokensMaxAgeSeconds})
 }
 
 app.use(express.static(path.join(__dirname, 'frontend')))
@@ -58,17 +61,27 @@ app.post('/signup', async (req, res, next) => {
     const {email, password} = req.body
     const salt = await bcrypt.genSalt()
     const hashedPassword = await bcrypt.hash(password, salt)
-   try{
-    const user = await createUser(email, hashedPassword)
-    const userId = user.id
-    const token = createToken(userId)
-    res.cookie('jwt', token, {httpOnly: true, maxAge: 10 * 24 * 60 * 60 * 1000})
-    res.status(201).json({user: userId})
+    if(email.includes('@') && password.length >= 7){
+        try{
+            const user = await createUser(email, hashedPassword)
+            const userId = user.id
+            const token = createToken(userId)
+            res.cookie('jwt', token, {httpOnly: true, maxAge: tokensMaxAgeMilliSeconds})
+            res.status(201).json({user: userId})
    }
-   catch(err) {
-    res.status(400).send("error, user is not created")
-    console.log(err)
+        catch(err) {
+            if(err.errno === 1062){
+                res.status(400).send({message: "User with this email is already exists", errorNumber: err.errno})
+                return
+            }
+        res.status(400).send({message: "User has not been created", errNo: err.errno})
+        console.log(err)
    }
+    } else if (!email.includes('@')) {
+        res.status(400).send({message: "Not a proper email adress", errNo: 1})
+    } else if (password.length < 7){
+        res.status(400).send({message: "Password should be at least 7 symbols", errNo: 2})
+    }
 })
 
 app.get('/', (req, res, next) => {
@@ -90,7 +103,7 @@ app.post('/changetodostate', async (req, res, next) => {
     const changedObj = req.body.request
     const newState = changedObj.state
     try{
-        const reponseFromDb = await db.query('UPDATE todos SET state = ? WHERE id = ?', [newState, changedObj.id])
+        const reponseFromDb = await db.query(dbQueries.changeTodoStateById, [newState, changedObj.id])
         const newTodoList = await listAllTodos(date)
         res.send(JSON.stringify(newTodoList))
 
@@ -123,8 +136,8 @@ app.post('/deleteTodo', async (req, res, next) => {
     const now = new Date()
     const currentDate = now.toISOString().split('T')[0]
     const deletedElementId = req.body.request.id
-    const [[deletedElement]] = await db.query('SELECT * FROM todos WHERE id = ?', [deletedElementId])
-    const reponseFromDb = await db.query('UPDATE todos SET deleted = TRUE WHERE id = ?;', [deletedElementId])
+    const [[deletedElement]] = await db.query(dbQueries.selectTodoById, [deletedElementId])
+    const reponseFromDb = await db.query(dbQueries.deleteTodoById, [deletedElementId])
     const newTodoList = await listAllTodos(currentDate)
     res.send(JSON.stringify({
         deletedElement,
