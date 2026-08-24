@@ -7,15 +7,4 @@ const connection = mysql.createPool({
   database: "my_app"
 });
 
-
-// connection.connect((err) => {
-//   if (err) {
-//     console.log("DB connection failed");
-//     console.log(err);
-//     return;
-//   }
-
-//   console.log("Connected to MySQL 🐬");
-// });
-
 module.exports = connection;

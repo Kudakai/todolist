@@ -40,17 +40,15 @@ app.use(express.static(path.join(__dirname, 'frontend')))
 app.use(express.json())
 
 app.use(express.urlencoded({ extended: true }));
+
 app.use(cookieParser())
 
 app.get('/login', (req, res, next) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'login.html'))
-    
+    res.sendFile(path.join(__dirname, 'frontend', 'login.html'))  
 })
 
 app.post('/login', (req, res, next) => {
-    res.send("New login")
-    const {email, password} = req.body
-    console.log(email, password)
+    
 })
 
 app.get('/signup', (req, res, next) => {
