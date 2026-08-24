@@ -9,9 +9,19 @@ const jwt = require('jsonwebtoken')
 
 const app = express()
 
+const port = 3000
 const tokensMaxAgeSeconds = 10 * 24 * 60 * 60
 const tokensMaxAgeMilliSeconds = 10 * 24 * 60 * 60
-const port = 3000
+
+function isValidEmail(email){
+    const checkResult = email?.includes('@') && email?.split('@')[1]?.includes('.')
+    return checkResult
+}
+
+function isValidPassword(password){
+    const checkResult = password?.length >= 7
+    return checkResult
+}
 
 async function listAllTodos(date) {
     const [todos] = await db.query(dbQueries.listAllTodosByDate, [date])
@@ -24,11 +34,14 @@ async function insertTodo(todo) {
     return reponse
 }
 
+async function changeTodoState(newState, id){
+    const response = db.query(dbQueries.changeTodoStateById, [newState, id])
+}
+
 async function createUser(email, password) {
-        const reponse = await db.query(dbQueries.createUser, 
+        const response = await db.query(dbQueries.createUser, 
         [email, password])
-    return { id: reponse[0].insertId,
-             email: email}
+        return response
 }
 
 function createToken(id){
@@ -48,7 +61,7 @@ app.get('/login', (req, res, next) => {
 })
 
 app.post('/login', (req, res, next) => {
-    
+
 })
 
 app.get('/signup', (req, res, next) => {
@@ -57,29 +70,31 @@ app.get('/signup', (req, res, next) => {
 
 app.post('/signup', async (req, res, next) => {
     const {email, password} = req.body
-    const salt = await bcrypt.genSalt()
-    const hashedPassword = await bcrypt.hash(password, salt)
-    if(email.includes('@') && password.length >= 7){
         try{
-            const user = await createUser(email, hashedPassword)
-            const userId = user.id
+            if(!isValidEmail(email)){
+                const err = {message: 'Entered Email is not valid. Email should contain "@" symbol and email domain after "."', id: 1}
+                throw err
+            }
+            if(!isValidPassword(password)){
+                const err = {message: 'Password should be at least 7 symbols', id: 2}
+                throw err
+            }
+            const salt = await bcrypt.genSalt()
+            const hashedPassword = await bcrypt.hash(password, salt)
+            const response = await createUser(email, hashedPassword)
+            console.log(response[0])
+            const userId = response[0].insertId
             const token = createToken(userId)
             res.cookie('jwt', token, {httpOnly: true, maxAge: tokensMaxAgeMilliSeconds})
-            res.status(201).json({user: userId})
-   }
-        catch(err) {
+            res.status(201).json({userId: userId})
+
+        } catch(err) {
             if(err.errno === 1062){
-                res.status(400).send({message: "User with this email is already exists", errorNumber: err.errno})
-                return
+                err = {message: 'Entered email is already in use',id: 3}
             }
-        res.status(400).send({message: "User has not been created", errNo: err.errno})
-        console.log(err)
-   }
-    } else if (!email.includes('@')) {
-        res.status(400).send({message: "Not a proper email adress", errNo: 1})
-    } else if (password.length < 7){
-        res.status(400).send({message: "Password should be at least 7 symbols", errNo: 2})
-    }
+            console.log(err)
+            res.status(400).send(err)
+        }
 })
 
 app.get('/', (req, res, next) => {
@@ -89,8 +104,8 @@ app.get('/', (req, res, next) => {
 app.get('/listAlltodos', async (req, res, next) => {
     const date = req.query.date
     try{
-        const todos = await listAllTodos(date)
-        res.send(JSON.stringify(todos))
+        const response = await listAllTodos(date)
+        res.send(JSON.stringify(response))
     }catch(err){
         res.status(500).send(err.message)
     }
@@ -101,7 +116,7 @@ app.post('/changetodostate', async (req, res, next) => {
     const changedObj = req.body.request
     const newState = changedObj.state
     try{
-        const reponseFromDb = await db.query(dbQueries.changeTodoStateById, [newState, changedObj.id])
+        const reponseFromDb = changeTodoState(changedObj, newState)
         const newTodoList = await listAllTodos(date)
         res.send(JSON.stringify(newTodoList))
 
@@ -135,7 +150,7 @@ app.post('/deleteTodo', async (req, res, next) => {
     const currentDate = now.toISOString().split('T')[0]
     const deletedElementId = req.body.request.id
     const [[deletedElement]] = await db.query(dbQueries.selectTodoById, [deletedElementId])
-    const reponseFromDb = await db.query(dbQueries.deleteTodoById, [deletedElementId])
+    const response = await db.query(dbQueries.deleteTodoById, [deletedElementId])
     const newTodoList = await listAllTodos(currentDate)
     res.send(JSON.stringify({
         deletedElement,
@@ -144,5 +159,5 @@ app.post('/deleteTodo', async (req, res, next) => {
 })
 
 app.listen(port, '0.0.0.0', () => {
-    console.log(`Server up and running on port ${port}`)
+    console.log(`App up and running on port ${port}`)
 })

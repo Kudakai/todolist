@@ -1,12 +1,13 @@
 const form = document.querySelector('form')
 const emailError = document.querySelector('.email_error')
 
+
 form.addEventListener('submit', async (e) => {
     e.preventDefault()
     const email = form.email.value
     const password = form.password.value
     try{
-        const res = await fetch('/signup', {
+            const res = await fetch('/signup', {
             method: 'POST',
             body: JSON.stringify({
                 email: email, password: password
