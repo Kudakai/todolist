@@ -48,13 +48,36 @@ function createToken(id, email){
     return jwt.sign({id, email}, 'Secret key', {expiresIn: tokensMaxAgeSeconds})
 }
 
+function requireAndCheckAuth(req, res, next){
+    const token = req.cookies.jwt
+    if(!token){
+       return res.redirect('/login')
+    }
+
+    try{
+        const decoded = jwt.verify(token, "Secret key")
+        req.user = decoded
+        next()
+    } catch(err){
+        return res.redirect('/login')
+    }
+}
+
+app.use(cookieParser())
+
+app.get('/', requireAndCheckAuth, (req, res, next) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'index.html'))
+})
+
 app.use(express.static(path.join(__dirname, 'frontend')))
 
 app.use(express.json())
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cookieParser())
+
+
+
 
 app.get('/login', (req, res, next) => {
     res.sendFile(path.join(__dirname, 'frontend', 'login.html'))  
@@ -64,11 +87,12 @@ app.post('/login', async (req, res, next) => {
     try{
         const {email, password} = req.body
         if(!isValidEmail(email)){
-            const err = {message: "Wrong email format", id: 1}
+            const err = {message: "Wrong email format", errorId: 1}
             throw err
         }
 
         const user = await db.query(dbQueries.findUserByEmail, [email])
+        const userId = user[0][0].id
         if(user[0].length === 0){
             const err = {message: "No user with this email", errorId: 2}
             throw err
@@ -78,7 +102,9 @@ app.post('/login', async (req, res, next) => {
             const err = {message: "Wrong password", errorId: 3}
             throw err
         }
-        res.status(200).json({message: "Suggessfully logged in", email, userId: user[0][0].id})
+        const token = createToken(userId, email)
+        res.cookie('jwt', token, {httpOnly: true, maxAge: tokensMaxAgeMilliSeconds})
+        res.status(200).json({message: "Suggessfully logged in", email, userId})
     } catch(err){
         console.log(err)
         res.status(400).json({err})
@@ -117,9 +143,7 @@ app.post('/signup', async (req, res, next) => {
         }
 })
 
-app.get('/', (req, res, next) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'index.html'))
-})
+
 
 app.get('/listAlltodos', async (req, res, next) => {
     const date = req.query.date

@@ -38,18 +38,21 @@ form.addEventListener('submit', async (e) => {
                                                   }),
                                             headers: {'Content-Type': 'application/json'}
         })
-        const data = await response.json()
-        console.log(data)
-        if(data.errorId === 1){
-            renderEmailValidationError()
-        }else if(data.errorId === 2){
-            renderNoEmailError()
-        }else if(data.errorId === 3){
-            renderWrongPasswordError()
-        }else if(data.userId){
-            location.assign('/')
-        }
-    } catch (err){
+    const data = await response.json()
+
+    if (data.err?.errorId === 1) {
+    renderEmailValidationError()
+
+    } else if (data.err?.errorId === 2) {
+    renderNoEmailError()
+
+    } else if (data.err?.errorId === 3) {
+    renderWrongPasswordError()
+
+    } else if (data.userId) {
+    location.assign('/')
+    }
+        } catch (err){
         
         }
 })
