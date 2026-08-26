@@ -48,7 +48,33 @@ input:focus {
     box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
-button {
+.password-container {
+    position: relative;
+}
+
+.password-container input {
+    padding-right: 60px;
+}
+
+#show-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    color: #2563eb;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+    user-select: none;
+}
+
+#show-password:hover {
+    color: #1d4ed8;
+}
+
+form > button {
     width: 100%;
     padding: 11px;
     border: none;
@@ -60,7 +86,7 @@ button {
     cursor: pointer;
 }
 
-button:hover {
+form > button:hover {
     background: #1d4ed8;
 }
 

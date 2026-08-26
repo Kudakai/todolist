@@ -53,3 +53,16 @@ form.addEventListener('submit', async (e) => {
         
         }
     })
+
+    const passwordInput = document.getElementById('password')
+const showPasswordButton = document.getElementById('show-password')
+
+showPasswordButton.addEventListener('click', () => {
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text'
+        showPasswordButton.textContent = 'Hide'
+    } else {
+        passwordInput.type = 'password'
+        showPasswordButton.textContent = 'Show'
+    }
+})

@@ -51,7 +51,6 @@ function createToken(id, email){
 
 function requireAndCheckAuth(req, res, next){
     const token = req.cookies.jwt
-    console.log(token)
     if(!token){
         if(req.path === '/login' || req.path === '/signup'){
             return next()
@@ -101,7 +100,6 @@ app.get('/signup', requireAndCheckAuth, (req, res, next) => {
 
 app.get('/', requireAndCheckAuth, (req, res, next) => {
     res.sendFile(path.join(__dirname, 'frontend', 'index.html'))
-    console.log(req.user)
 })
 
 app.post('/login', async (req, res, next) => {

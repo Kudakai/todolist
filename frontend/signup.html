@@ -1,29 +1,53 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./signup.css">
     <title>Register</title>
 </head>
+
 <body>
 
     <form>
+
         <h2>Sign up</h2>
-        <label for="username">Email:</label>
+
+        <label for="email">Email:</label>
+
         <input id="email" name="email" required>
+
         <div class="email error hidden"></div>
 
         <br><br>
 
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+
+        <div class="password-container">
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                required
+            >
+
+            <span id="show-password">Show</span>
+
+        </div>
+
         <div class="password error hidden"></div>
 
         <br><br>
 
-        <button>Signup</button>
+        <button type="submit">Signup</button>
+
     </form>
+
     <script src="./signup.js"></script>
+
 </body>
+
 </html>
