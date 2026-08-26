@@ -125,7 +125,7 @@ app.post('/login', async (req, res, next) => {
             throw err
         }
         const token = createToken(userId, email)
-        res.cookie('jwt', token, {httpOnly: true, maxAge: tokensMaxAgeMilliSeconds})
+        res.cookie('jwt', token, {httpOnly: true, maxAge: tokensMaxAgeSeconds*1000})
         res.status(200).json({message: "Suggessfully logged in", email, userId})
     } catch(err){
         console.log(err)
@@ -152,7 +152,7 @@ app.post('/signup', async (req, res, next) => {
             const response = await createUser(email, hashedPassword)
             const userId = response[0].insertId
             const token = createToken(userId, email)
-            res.cookie('jwt', token, {httpOnly: true, maxAge: tokensMaxAgeMilliSeconds})
+            res.cookie('jwt', token, {httpOnly: true, maxAge: tokensMaxAgeSeconds*1000})
             res.status(201).json({userId: userId})
 
         } catch(err) {
