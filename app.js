@@ -105,8 +105,9 @@ app.get('/', requireAndCheckAuth, (req, res, next) => {
 
 app.post('/login', async (req, res, next) => {
     try{
+        
         const {email, password} = req.body
-        console.log(email,password)
+        
         if(!isValidEmail(email)){
             const err = {message: "Wrong email format", errorId: 1}
             throw err
@@ -179,10 +180,11 @@ app.get('/listAlltodos', requireAndCheckAuth, async (req, res, next) => {
 app.post('/changetodostate', requireAndCheckAuth, async (req, res, next) => {
     const date = req.query.date
     const changedObj = req.body.request
+    console.log(changedObj)
     const newState = changedObj.state
     const user = req.user.id
     try{
-        const reponseFromDb = changeTodoState(changedObj, newState)
+        const reponseFromDb = changeTodoState(changedObj.state, changedObj.id)
         const newTodoList = await listAllTodos(date, user)
         res.send(JSON.stringify(newTodoList))
 
@@ -231,6 +233,26 @@ app.get('/logout', async (req, res, next) => {
     console.log("logout endpoint has been touched")
     res.clearCookie('jwt')
     res.redirect('/login')
+})
+
+app.get('/returnUserInfo', async (req, res, next) => {
+    const token = req.cookies.jwt
+    try{
+        
+        if(!token){
+            return res.status(400).send({message: "No logged in user"})
+        }
+
+        const result = await jwt.verify(token, "Secret key")
+    
+        const decodedUserInfo = await jwt.decode(token)
+        console.log(decodedUserInfo)
+        res.json(decodedUserInfo)
+    } catch(err){
+        res.status(400).send({message: "Expired or non-valid JWT token provided"})
+    }
+
+
 })
 
 app.use(express.static(path.join(__dirname, 'frontend')))

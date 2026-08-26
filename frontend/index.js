@@ -17,6 +17,13 @@ LogOutButton.addEventListener('click', () => {
     window.location.href = '/logout'
 })
 
+async function renderUserEmail(){
+    const response = await fetch('/returnUserInfo')
+    const parsedResponse = await response.json()
+    userEmail.textContent = parsedResponse.email
+}
+
+renderUserEmail()
 
 let todoChart = null
 
