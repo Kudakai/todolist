@@ -23,8 +23,8 @@ function isValidPassword(password){
     return checkResult
 }
 
-async function listAllTodos(date) {
-    const [todos] = await db.query(dbQueries.listAllTodosByDate, [date])
+async function listAllTodos(date, user) {
+    const [todos] = await db.query(dbQueries.listAllTodosByDateAndUser, [date, user])
     return todos
 }
 
@@ -51,37 +51,57 @@ function createToken(id, email){
 function requireAndCheckAuth(req, res, next){
     const token = req.cookies.jwt
     if(!token){
-       return res.redirect('/login')
+        if(req.path === '/login' || req.path === '/signup'){
+            return next()
+        }
+        return res.redirect('/login')
     }
 
     try{
         const decoded = jwt.verify(token, "Secret key")
         req.user = decoded
+        if(req.path === '/login' || req.path === '/signup'){
+            return res.redirect('/')
+        }
         next()
     } catch(err){
-        return res.redirect('/login')
+        if (req.path === '/login' || req.path === '/signup') {
+            return next()
+        }
+        return res.redirect('/login') 
     }
 }
 
 app.use(cookieParser())
+app.use(express.json())
+app.use((req, res, next) => {
+
+    if (req.cookies.jwt) {
+        const userInfo = jwt.decode(req.cookies.jwt)
+
+        req.user = userInfo
+    }
+
+    next()
+})
+
+app.get('/login', requireAndCheckAuth, (req, res, next) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'login.html')) 
+})
+
+app.get('/signup', requireAndCheckAuth, (req, res, next) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'signup.html'))
+})
 
 app.get('/', requireAndCheckAuth, (req, res, next) => {
     res.sendFile(path.join(__dirname, 'frontend', 'index.html'))
+    console.log(req.user)
 })
 
-app.use(express.static(path.join(__dirname, 'frontend')))
-
-app.use(express.json())
 
 app.use(express.urlencoded({ extended: true }));
 
 
-
-
-
-app.get('/login', (req, res, next) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'login.html'))  
-})
 
 app.post('/login', async (req, res, next) => {
     try{
@@ -112,9 +132,7 @@ app.post('/login', async (req, res, next) => {
     }
 })
 
-app.get('/signup', (req, res, next) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'signup.html'))
-})
+
 
 app.post('/signup', async (req, res, next) => {
     const {email, password} = req.body
@@ -147,8 +165,11 @@ app.post('/signup', async (req, res, next) => {
 
 app.get('/listAlltodos', async (req, res, next) => {
     const date = req.query.date
+    const user = req.user.id
     try{
-        const response = await listAllTodos(date)
+        const response = await listAllTodos(date, user)
+        console.log(response)
+        console.log(user)
         res.send(JSON.stringify(response))
     }catch(err){
         res.status(500).send(err.message)
@@ -159,9 +180,10 @@ app.post('/changetodostate', async (req, res, next) => {
     const date = req.query.date
     const changedObj = req.body.request
     const newState = changedObj.state
+    const user = req.user.id
     try{
         const reponseFromDb = changeTodoState(changedObj, newState)
-        const newTodoList = await listAllTodos(date)
+        const newTodoList = await listAllTodos(date, user)
         res.send(JSON.stringify(newTodoList))
 
     }catch(err){
@@ -179,9 +201,10 @@ app.post('/addTodo', async (req, res,next) => {
         userId: "123",
         date: body.todoDate
     }
+    const user = req.user.id
     try{
         const response = await insertTodo(todoObj)
-        const allTodos = await listAllTodos(body.todoDate)
+        const allTodos = await listAllTodos(body.todoDate, user)
         res.send(JSON.stringify(allTodos))
     }catch(err){
         res.send(err.message)
@@ -191,16 +214,19 @@ app.post('/addTodo', async (req, res,next) => {
 
 app.post('/deleteTodo', async (req, res, next) => {
     const now = new Date()
+    const user = req.user.id
     const currentDate = now.toISOString().split('T')[0]
     const deletedElementId = req.body.request.id
     const [[deletedElement]] = await db.query(dbQueries.selectTodoById, [deletedElementId])
     const response = await db.query(dbQueries.deleteTodoById, [deletedElementId])
-    const newTodoList = await listAllTodos(currentDate)
+    const newTodoList = await listAllTodos(currentDate, user)
     res.status(200).send(JSON.stringify({
         deletedElement,
         newTodoList
     }))
 })
+
+app.use(express.static(path.join(__dirname, 'frontend')))
 
 app.listen(port, '0.0.0.0', () => {
     console.log(`App up and running on port ${port}`)

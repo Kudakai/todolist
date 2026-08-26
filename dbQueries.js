@@ -1,4 +1,4 @@
-const listAllTodosByDate = 'SELECT * from todos WHERE date = ? and deleted = false'
+const listAllTodosByDateAndUser = 'SELECT * from todos WHERE date = ? and deleted = false and userId = ?'
 const insertTodo = 'INSERT INTO todos (todo, state, userId, date) VALUES (?, ?, ?, ?)'
 const createUser = 'INSERT INTO users (email, password) VALUES (?, ?)'
 const changeTodoStateById = 'UPDATE todos SET state = ? WHERE id = ?'
@@ -7,7 +7,7 @@ const selectTodoById = 'SELECT * FROM todos WHERE id = ?'
 const findUserByEmail = 'SELECT * FROM users WHERE email = ?'
 
 module.exports = {
-    listAllTodosByDate,
+    listAllTodosByDateAndUser,
     insertTodo,
     createUser,
     changeTodoStateById,
