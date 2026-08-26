@@ -65,6 +65,9 @@ function requireAndCheckAuth(req, res, next){
         }
         next()
     } catch(err){
+        if(req.path === '/listAlltodos' || req.path === 'changetodostate' || req.path === 'deleteTodo' || req.path === '/addTodo'){
+            return res.redirect('/login') 
+        }
         if (req.path === '/login' || req.path === '/signup') {
             return next()
         }
@@ -163,20 +166,18 @@ app.post('/signup', async (req, res, next) => {
 
 
 
-app.get('/listAlltodos', async (req, res, next) => {
+app.get('/listAlltodos', requireAndCheckAuth, async (req, res, next) => {
     const date = req.query.date
     const user = req.user.id
     try{
         const response = await listAllTodos(date, user)
-        console.log(response)
-        console.log(user)
         res.send(JSON.stringify(response))
     }catch(err){
         res.status(500).send(err.message)
     }
 })
 
-app.post('/changetodostate', async (req, res, next) => {
+app.post('/changetodostate', requireAndCheckAuth, async (req, res, next) => {
     const date = req.query.date
     const changedObj = req.body.request
     const newState = changedObj.state
@@ -193,12 +194,13 @@ app.post('/changetodostate', async (req, res, next) => {
     
 })
 
-app.post('/addTodo', async (req, res,next) => {
+app.post('/addTodo', requireAndCheckAuth, async (req, res,next) => {
     const body = req.body
+    const userId = req.user.id
     const todoObj = {
         todo: body.todoText,
         state: false,
-        userId: "123",
+        userId: userId,
         date: body.todoDate
     }
     const user = req.user.id
@@ -212,7 +214,7 @@ app.post('/addTodo', async (req, res,next) => {
     }
 })
 
-app.post('/deleteTodo', async (req, res, next) => {
+app.post('/deleteTodo', requireAndCheckAuth, async (req, res, next) => {
     const now = new Date()
     const user = req.user.id
     const currentDate = now.toISOString().split('T')[0]

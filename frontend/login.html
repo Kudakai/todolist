@@ -1,29 +1,46 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./login.css">
     <title>Login</title>
 </head>
+
 <body>
 
     <form>
+
         <h2>Login</h2>
+
         <label for="username">Email:</label>
         <input id="email" name="email" required>
+
         <div class="email error hidden"></div>
 
         <br><br>
 
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required>
+
         <div class="password error hidden"></div>
 
         <br><br>
 
         <button>Log in</button>
+
+        <p>Or if you don't have an account then</p>
+
+        <button type="button" onclick="window.location.href='/signup'">
+            Sign up
+        </button>
+
     </form>
+
     <script src="./login.js"></script>
+
 </body>
+
 </html>

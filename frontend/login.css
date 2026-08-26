@@ -79,3 +79,7 @@ button:hover {
 .hidden {
     display: none;
 }
+
+form p {
+    text-align: center;
+}
