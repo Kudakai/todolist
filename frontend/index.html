@@ -1,54 +1,106 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Todo List</title>
+
   <link rel="stylesheet" href="style.css" />
+
 </head>
+
 <body>
+
+<div style="display: flex; justify-content: center; align-items: center; padding: 15px 20px;">
+  <span id="user_email" style="font-size: 16px;">user@example.com</span>
+  <button id="logout_button" style="margin-left: 10px; padding: 8px 16px; cursor: pointer; background-color: red; color: white; border: none; border-radius: 4px;">
+    Log out
+  </button>
+</div>
+
   <div class="date-card">
+
     <label for="date">Select a date for browsing</label>
 
     <div class="date-row">
+
     <input type="date" id="date">
+
     <button id="apply_date_button">Apply</button>
+
     </div>
+
   </div>
 
   <div class="todo-box">
+
     <h1>Task List</h1>
+
     <div class="stats">
+
       <div class="stats-div">
+
         <p class="stats-title">Total Tasks</p>
+
         <p class="stats-value" id="total_tasks_value">--</p>
+
       </div>
+
       <div class="stats-div">
+
         <p class="stats-title">Completed Tasks</p>
+
         <p class="stats-value" id="completed_tasks_value">--</p>
+
       </div>
+
       <div class="stats-div">
+
         <p class="stats-title">Uncompleted Tasks</p>
+
         <p class="stats-value" id="uncompleted_tasks_value">--</p>
+
       </div>
+
     </div>
 
     <div class="input-row">
+
       <input id="inputField" type="text" placeholder="Add a new task" />
+
       <button id="add_button">Add</button>
+
     </div>
+
     <p id="input_error" class="input-error hidden">❗️ New Task field cannot be empty</p>
 
     <ul class="todo-list">
+
       <div>
+
         <p id="no_todos_message" class ="hidden">No todos for selected date ☺️</p>
+
       </div>
+
     </ul>
+
     <div class="chart-container hidden">
+
     <canvas id="myChart" width="260" height="260"></canvas>
+
   </div>
+
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <script src="index.js"></script>
+
 </body>
+
 </html>

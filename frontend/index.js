@@ -10,6 +10,13 @@ const dateApplyBtn = document.getElementById('apply_date_button')
 const noTodosMessage = document.getElementById('no_todos_message')
 const chartCanvas = document.getElementById('myChart')
 const chartContainer = document.querySelector('.chart-container')
+const userEmail = document.querySelector('#user_email')
+const LogOutButton = document.querySelector('#logout_button')
+
+LogOutButton.addEventListener('click', () => {
+    window.location.href = '/logout'
+})
+
 
 let todoChart = null
 

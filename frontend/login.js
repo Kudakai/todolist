@@ -11,7 +11,7 @@ function hideAllErrors(){
 }
 
 function renderNoEmailError() {
-    emailError.innerHTML = '<p>No user with such email</p>'
+    emailError.innerHTML = '<p>User not found</p>'
     emailError.classList.remove('hidden')
 }
 

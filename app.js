@@ -50,6 +50,7 @@ function createToken(id, email){
 
 function requireAndCheckAuth(req, res, next){
     const token = req.cookies.jwt
+    console.log(token)
     if(!token){
         if(req.path === '/login' || req.path === '/signup'){
             return next()
@@ -77,6 +78,7 @@ function requireAndCheckAuth(req, res, next){
 
 app.use(cookieParser())
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
 
     if (req.cookies.jwt) {
@@ -88,7 +90,7 @@ app.use((req, res, next) => {
     next()
 })
 
-app.get('/login', requireAndCheckAuth, (req, res, next) => {
+app.get('/login', (req, res, next) => {
     res.sendFile(path.join(__dirname, 'frontend', 'login.html')) 
 })
 
@@ -101,21 +103,18 @@ app.get('/', requireAndCheckAuth, (req, res, next) => {
     console.log(req.user)
 })
 
-
-app.use(express.urlencoded({ extended: true }));
-
-
-
 app.post('/login', async (req, res, next) => {
     try{
         const {email, password} = req.body
+        console.log(email,password)
         if(!isValidEmail(email)){
             const err = {message: "Wrong email format", errorId: 1}
             throw err
         }
 
         const user = await db.query(dbQueries.findUserByEmail, [email])
-        const userId = user[0][0].id
+        console.log(user)
+        const userId = user[0][0]?.id
         if(user[0].length === 0){
             const err = {message: "No user with this email", errorId: 2}
             throw err
@@ -226,6 +225,12 @@ app.post('/deleteTodo', requireAndCheckAuth, async (req, res, next) => {
         deletedElement,
         newTodoList
     }))
+})
+
+app.get('/logout', async (req, res, next) => {
+    console.log("logout endpoint has been touched")
+    res.clearCookie('jwt')
+    res.redirect('/login')
 })
 
 app.use(express.static(path.join(__dirname, 'frontend')))
