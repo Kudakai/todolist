@@ -35,7 +35,8 @@ async function insertTodo(todo) {
 }
 
 async function changeTodoState(newState, id){
-    const response = db.query(dbQueries.changeTodoStateById, [newState, id])
+    const response = await db.query(dbQueries.changeTodoStateById, [newState, id])
+    return response
 }
 
 async function createUser(email, password) {
@@ -178,21 +179,30 @@ app.get('/listAlltodos', requireAndCheckAuth, async (req, res, next) => {
 })
 
 app.post('/changetodostate', requireAndCheckAuth, async (req, res, next) => {
+
     const date = req.query.date
     const changedObj = req.body.request
-    console.log(changedObj)
-    const newState = changedObj.state
     const user = req.user.id
-    try{
-        const reponseFromDb = changeTodoState(changedObj.state, changedObj.id)
-        const newTodoList = await listAllTodos(date, user)
-        res.send(JSON.stringify(newTodoList))
 
-    }catch(err){
-        res.status(500).send(err.message)
+    console.log(changedObj)
+
+    try {
+
+        await changeTodoState(
+            changedObj.state,
+            changedObj.id
+        )
+
+        const newTodoList = await listAllTodos(date, user)
+
+        res.json(newTodoList)
+
+    } catch (err) {
+
         console.log(err.message)
+        res.status(500).send(err.message)
+
     }
-    
 })
 
 app.post('/addTodo', requireAndCheckAuth, async (req, res,next) => {

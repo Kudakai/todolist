@@ -27,15 +27,20 @@ renderUserEmail()
 
 let todoChart = null
 
-function hideChart(){
+function hideChart() {
     chartContainer.classList.add('hidden')
+
+    if (todoChart !== null) {
+        todoChart.destroy()
+        todoChart = null
+    }
 }
 
 function renderAndUpdateChart(todolist) {
     chartContainer.classList.remove('hidden')
 
-    const completed = todolist.filter(todo => todo.state == true).length
-    const uncompleted = todolist.filter(todo => todo.state == false).length
+    const completed = todolist.filter(todo => todo.state == 1).length
+    const uncompleted = todolist.filter(todo => todo.state == 0).length
 
     if (todoChart === null) {
         todoChart = new Chart(chartCanvas, {
@@ -179,25 +184,36 @@ function renderTodo(todo) {
     const checkbox = newLi.querySelector('.check')
     const deleteBtn = newLi.querySelector('.delete')
     checkbox.addEventListener('change', async (e) => {
-        const element = e.target.parentElement
-        const request = { 
-            id: element.id, 
-            todo: element.querySelector('span').textContent,
-            state: element.querySelector('.check').checked
-        }
-        const reponseFromServer = await fetch(`/changetodostate?date=${datePickerInput.value}`,{
+
+
+    const element = e.target.parentElement
+
+    const request = { 
+        id: element.id, 
+        todo: element.querySelector('span').textContent,
+        state: element.querySelector('.check').checked
+    }
+
+
+
+    const responseFromServer = await fetch(
+        `/changetodostate?date=${datePickerInput.value}`,
+        {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
-
             },
-            body: JSON.stringify({ request })})
-        const todos = await reponseFromServer.json()
+            body: JSON.stringify({ request })
+        }
+    )
+
+    const todos = await responseFromServer.json()
 
 
-        updateStatistics(todos)
-        renderAndUpdateChart(todos)
-    })
+
+    updateStatistics(todos)
+    renderAndUpdateChart(todos)
+})
 
     deleteBtn.addEventListener('click', (e) => {
         emptyInputWarning.classList.add('hidden')
